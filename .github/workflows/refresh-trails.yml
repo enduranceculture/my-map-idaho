@@ -2,8 +2,13 @@ name: Refresh USFS trail data
 
 on:
   schedule:
-    - cron: '0 15 1 * *'  # 1st of each month, 8am MT
-  workflow_dispatch: {}    # allow manual runs from the Actions tab
+    - cron: "0 15 1 * *" # 1st of each month, 8am MT
+  workflow_dispatch: {} # allow manual runs from the Actions tab
+  push:
+    branches:
+      - main
+    paths:
+      - "scripts/pull_usfs_trails.py"
 
 permissions:
   contents: write
@@ -15,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
       - name: Pull latest USFS data
         run: python scripts/pull_usfs_trails.py
       - name: Commit if changed
