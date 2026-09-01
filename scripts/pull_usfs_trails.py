@@ -15,6 +15,7 @@ import urllib.request
 BASE = "https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_TrailNFSPublish_01/MapServer/0/query"
 
 # region_name -> bbox as 'min_lon,min_lat,max_lon,max_lat' (WGS84)
+# Each region emits raw, bike-confirmed, and lightweight app-facing GeoJSON layers.
 REGIONS = {
     "woodriver_sawtooth": "-115.2,43.3,-114.0,44.3",
     # Tight context window around Sammy's Warm Springs TH -> Bonneville Hot Springs ride.
