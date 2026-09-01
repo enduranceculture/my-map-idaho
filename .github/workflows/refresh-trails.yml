@@ -29,4 +29,7 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add data/
           git diff --staged --quiet || git commit -m "Auto-refresh USFS trail data ($(date +%F))"
+          # Another map-layer job or manual edit can land while this refresh runs.
+          # Rebase the generated data commit before pushing so parallel work is preserved.
+          git pull --rebase origin main
           git push
