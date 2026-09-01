@@ -19,6 +19,7 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
+from shapely import make_valid
 from shapely.geometry import (
     GeometryCollection,
     MultiPolygon,
@@ -158,6 +159,8 @@ def load_idaho_boundary():
     boundary = geometries[0]
     for geometry in geometries[1:]:
         boundary = boundary.union(geometry)
+    if not boundary.is_valid:
+        boundary = make_valid(boundary)
     return boundary
 
 
@@ -181,11 +184,18 @@ def polygonal_only(geometry):
 
 def clip_polygons(features: list[dict], boundary) -> list[dict]:
     clipped = []
+    repaired_count = 0
     for feature in features:
         geometry = shape(feature["geometry"])
+        if not geometry.is_valid:
+            geometry = make_valid(geometry)
+            repaired_count += 1
         if not geometry.intersects(boundary):
             continue
-        geometry = polygonal_only(geometry.intersection(boundary))
+        intersection = geometry.intersection(boundary)
+        if not intersection.is_valid:
+            intersection = make_valid(intersection)
+        geometry = polygonal_only(intersection)
         if geometry is None or geometry.is_empty:
             continue
         clipped.append(
@@ -195,6 +205,8 @@ def clip_polygons(features: list[dict], boundary) -> list[dict]:
                 "properties": feature.get("properties") or {},
             }
         )
+    if repaired_count:
+        print(f"Repaired {repaired_count} invalid source polygon(s) before clipping")
     return clipped
 
 
@@ -305,7 +317,8 @@ def pull_padus(boundary) -> None:
     source_name = "USGS Protected Areas Database of the United States (PAD-US) 4.1"
     note = (
         "Fee/public-land manager view. Private, NGO, and unknown manager types are "
-        "excluded from this base public-land layer."
+        "excluded from this base public-land layer. Invalid upstream polygon topology "
+        "is repaired only as needed to produce valid Idaho clipping."
     )
     write_geojson(
         BOUNDARY_DIR / "usgs_padus4_1_public_land_managers_idaho.geojson",
