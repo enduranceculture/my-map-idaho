@@ -9,6 +9,7 @@ on:
       - main
     paths:
       - "scripts/pull_idaho_base_v1_completion.py"
+      - "scripts/pull_idaho_base_v1_completion_resilient.py"
       - "scripts/package_large_geojson.py"
       - ".github/workflows/refresh-base-v1.yml"
 
@@ -30,7 +31,7 @@ jobs:
       - name: Install geospatial dependency
         run: python -m pip install "shapely>=2.0,<3"
       - name: Pull final Base v1 sources
-        run: python scripts/pull_idaho_base_v1_completion.py
+        run: python scripts/pull_idaho_base_v1_completion_resilient.py
       - name: Package oversized GeoJSON
         run: python scripts/package_large_geojson.py
       - name: Validate generated data
