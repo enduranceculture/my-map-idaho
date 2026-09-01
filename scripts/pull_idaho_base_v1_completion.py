@@ -72,13 +72,19 @@ PUBLIC_MANAGER_TYPES = {"FED", "TRIB", "STAT", "LOC", "DIST", "JNT", "TERR"}
 
 
 def request_json(url: str, params: dict, attempts: int = 4) -> dict:
-    query = urllib.parse.urlencode(params)
-    request = urllib.request.Request(
-        f"{url}?{query}",
-        headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
-    )
+    encoded = urllib.parse.urlencode(params).encode("utf-8")
     last_error: object = None
     for attempt in range(attempts):
+        request = urllib.request.Request(
+            url,
+            data=encoded,
+            headers={
+                "User-Agent": USER_AGENT,
+                "Accept": "application/json",
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            method="POST",
+        )
         try:
             with urllib.request.urlopen(request, timeout=120) as response:
                 payload = json.loads(response.read().decode("utf-8"))
