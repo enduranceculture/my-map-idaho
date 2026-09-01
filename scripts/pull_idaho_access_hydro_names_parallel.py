@@ -1,8 +1,10 @@
 """Run the Idaho access/hydro/names pipeline with bounded parallel ArcGIS fetches.
 
 The base module owns source definitions, clipping, normalization, and outputs.
-This runner only replaces chunk retrieval so large Idaho layers do not fetch
-hundreds of ArcGIS response batches serially.
+This runner applies one product-level scope rule — keep USFS roads that the
+published Forest Service symbology classifies as passenger-car roads or roads
+not maintained for passenger cars — then replaces serial chunk retrieval with
+bounded parallel requests.
 """
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -11,6 +13,11 @@ import pull_idaho_access_hydro_names as pipeline
 
 
 MAX_WORKERS = 4
+
+# High-value access intelligence, not every administrative road geometry.
+# 517 paved; 518 gravel passenger-car; 515 dirt passenger-car;
+# 106 not maintained for passenger cars / typically rougher access.
+pipeline.SOURCES["roads"]["where"] = "symbol_code IN (106,515,517,518)"
 
 
 def parallel_fetch_features_by_ids(config: dict, object_ids: list[int]) -> list[dict]:
