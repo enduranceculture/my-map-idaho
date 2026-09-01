@@ -9,6 +9,7 @@ on:
       - main
     paths:
       - "scripts/pull_idaho_access_hydro_names.py"
+      - "scripts/pull_idaho_access_hydro_names_parallel.py"
       - ".github/workflows/refresh-access-hydro-names.yml"
 
 concurrency:
@@ -29,7 +30,7 @@ jobs:
       - name: Install geospatial dependency
         run: python -m pip install "shapely>=2.0,<3"
       - name: Pull Idaho access hydro and names
-        run: python scripts/pull_idaho_access_hydro_names.py
+        run: python scripts/pull_idaho_access_hydro_names_parallel.py
       - name: Commit if changed
         run: |
           git config user.name "map-data-bot"
