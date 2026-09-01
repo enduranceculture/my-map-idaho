@@ -6,6 +6,7 @@ counts and removes them before the base clipping functions run. All spatial reco
 continue through the normal topology-repair and exact Idaho clipping path.
 """
 
+# ruff: noqa: I001
 import pull_idaho_base_v1_completion as pipeline
 
 
