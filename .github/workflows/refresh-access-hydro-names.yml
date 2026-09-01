@@ -4,12 +4,6 @@ on:
   schedule:
     - cron: "0 16 3 * *" # 3rd of each month, staggered after trails/foundation
   workflow_dispatch: {}
-  push:
-    branches:
-      - main
-    paths:
-      - "scripts/pull_idaho_access_hydro_names.py"
-      - ".github/workflows/refresh-access-hydro-names.yml"
 
 permissions:
   contents: write
