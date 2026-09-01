@@ -1,0 +1,27 @@
+{
+  "source_name": "USDA Forest Service Fireshed Mature and Old Growth Area, Federal Lands Only",
+  "source_type": "ArcGIS Feature Layer",
+  "service": "https://apps.fs.usda.gov/fsgisx02/rest/services/wo_nfs_gstc/WO_OSC_GapAnalysis_OldGrowthAndMatureForests/MapServer",
+  "layer_id": 29,
+  "layer_url": "https://apps.fs.usda.gov/fsgisx02/rest/services/wo_nfs_gstc/WO_OSC_GapAnalysis_OldGrowthAndMatureForests/MapServer/29",
+  "native_spatial_reference": 5070,
+  "requested_map_spatial_reference": 4326,
+  "fields_of_interest": [
+    "OBJECTID",
+    "Fireshed_Name",
+    "MajRegion",
+    "MATURE_ACRES",
+    "MATURE_SE_PERC",
+    "OLD_GROWTH_ACRES",
+    "OLD_GROWTH_SE_PERC",
+    "ForestType",
+    "Division",
+    "Nine_Class",
+    "Trimmed_Area"
+  ],
+  "scope_target": "Idaho",
+  "status": "source-identified-not-materialized",
+  "status_note": "Forest Atlas V2's last ingestion attempt failed closed because the upstream service rejected spatial and returnIdsOnly queries. A non-spatial count succeeded. Do not substitute fixture polygons for this source.",
+  "source_project": "enduranceculture/forest-atlas-v2",
+  "promoted_to_map_repo": "2026-08-31"
+}
