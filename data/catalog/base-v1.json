@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "catalog_id": "my-map-idaho-base-v1",
+  "snapshot_date": "2026-09-01",
+  "repository": "enduranceculture/my-map-idaho",
+  "raw_base": "https://raw.githubusercontent.com/enduranceculture/my-map-idaho/main/",
+  "purpose": "Stable machine-readable delivery catalog for consuming map applications. Cartography, colors, visibility, zoom behavior, and interaction remain app concerns.",
+  "layers": [
+    {
+      "id": "idaho-boundary",
+      "label": "Idaho Boundary",
+      "group": "boundaries",
+      "scope": "statewide",
+      "geometry": "polygon",
+      "feature_count": 1,
+      "source_class": "official",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/boundaries/idaho_census_2025.geojson"
+        }
+      }
+    },
+    {
+      "id": "public-land-managers",
+      "label": "Public Land Managers",
+      "group": "boundaries",
+      "scope": "statewide",
+      "geometry": "polygon",
+      "feature_count": 1685,
+      "source_class": "official",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/boundaries/usgs_padus4_1_public_land_managers_idaho_map.geojson"
+        },
+        "source": {
+          "type": "geojson",
+          "path": "data/boundaries/usgs_padus4_1_public_land_managers_idaho.geojson"
+        }
+      }
+    },
+    {
+      "id": "national-forests",
+      "label": "National Forests",
+      "group": "boundaries",
+      "scope": "statewide",
+      "geometry": "polygon",
+      "feature_count": 17,
+      "source_class": "official",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/boundaries/usfs_administrative_forests_idaho_map.geojson"
+        },
+        "source": {
+          "type": "geojson",
+          "path": "data/boundaries/usfs_administrative_forests_idaho.geojson"
+        }
+      }
+    },
+    {
+      "id": "wilderness",
+      "label": "Wilderness",
+      "group": "boundaries",
+      "scope": "statewide",
+      "geometry": "polygon",
+      "feature_count": 9,
+      "source_class": "official",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/boundaries/usfs_wilderness_idaho_map.geojson"
+        },
+        "source": {
+          "type": "geojson",
+          "path": "data/boundaries/usfs_wilderness_idaho.geojson"
+        }
+      }
+    },
+    {
+      "id": "ranger-districts",
+      "label": "Ranger Districts",
+      "group": "boundaries",
+      "scope": "statewide",
+      "geometry": "polygon",
+      "feature_count": 58,
+      "source_class": "official",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/boundaries/usfs_ranger_districts_idaho_map.geojson"
+        },
+        "source": {
+          "type": "geojson",
+          "path": "data/boundaries/usfs_ranger_districts_idaho.geojson"
+        }
+      }
+    },
+    {
+      "id": "drive-access-roads",
+      "label": "Drive Access Roads",
+      "group": "access",
+      "scope": "statewide",
+      "geometry": "line",
+      "feature_count": 9510,
+      "source_class": "official",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/access/usfs_roads_idaho_map.geojson"
+        },
+        "source": {
+          "type": "manifest",
+          "path": "data/access/usfs_roads_idaho_manifest.json"
+        }
+      },
+      "notes": "Browser file is simplified but still relatively large; a strong future vector-tile candidate."
+    },
+    {
+      "id": "recreation-sites",
+      "label": "Recreation Sites",
+      "group": "access",
+      "scope": "statewide",
+      "geometry": "point",
+      "feature_count": 4338,
+      "source_class": "official",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/access/usfs_recreation_sites_rich_idaho_map.geojson"
+        },
+        "source": {
+          "type": "geojson",
+          "path": "data/access/usfs_recreation_sites_rich_idaho.geojson"
+        }
+      }
+    },
+    {
+      "id": "trailheads",
+      "label": "Trailheads",
+      "group": "access",
+      "scope": "statewide",
+      "geometry": "point",
+      "feature_count": 488,
+      "source_class": "official",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/access/usfs_trailheads_rich_idaho.geojson"
+        }
+      }
+    },
+    {
+      "id": "named-flowlines",
+      "label": "Named Rivers & Creeks",
+      "group": "hydro",
+      "scope": "statewide",
+      "geometry": "line",
+      "feature_count": 115879,
+      "source_class": "official",
+      "delivery": {
+        "browser": {
+          "type": "manifest",
+          "path": "data/hydro/usgs_3dhp_named_flowlines_idaho_map_manifest.json"
+        },
+        "source": {
+          "type": "manifest",
+          "path": "data/hydro/usgs_3dhp_named_flowlines_idaho_manifest.json"
+        }
+      },
+      "notes": "Load every shard listed by the selected manifest as one logical layer. Highest-priority vector-tile candidate for a polished statewide viewer."
+    },
+    {
+      "id": "named-waterbodies",
+      "label": "Named Lakes & Waterbodies",
+      "group": "hydro",
+      "scope": "statewide",
+      "geometry": "polygon",
+      "feature_count": 1907,
+      "source_class": "official",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/hydro/usgs_3dhp_named_waterbodies_idaho_map.geojson"
+        },
+        "source": {
+          "type": "geojson",
+          "path": "data/hydro/usgs_3dhp_named_waterbodies_idaho.geojson"
+        }
+      }
+    },
+    {
+      "id": "springs",
+      "label": "Springs",
+      "group": "hydro",
+      "scope": "statewide",
+      "geometry": "point",
+      "feature_count": 12836,
+      "source_class": "official",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/hydro/usgs_3dhp_springs_idaho.geojson"
+        }
+      }
+    },
+    {
+      "id": "named-landforms",
+      "label": "Named Landforms",
+      "group": "places",
+      "scope": "statewide",
+      "geometry": "point",
+      "feature_count": 8374,
+      "source_class": "official",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/places/usgs_gnis_landforms_idaho.geojson"
+        }
+      }
+    },
+    {
+      "id": "old-growth-research",
+      "label": "Old Growth Research",
+      "group": "old-growth",
+      "scope": "idaho-research",
+      "geometry": "point",
+      "feature_count": 15,
+      "source_class": "user-researched",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/old-growth/old_growth_research_points_idaho.geojson"
+        }
+      }
+    },
+    {
+      "id": "mature-old-growth-landscapes",
+      "label": "Mature / Old-Growth Landscapes",
+      "group": "old-growth",
+      "scope": "statewide",
+      "geometry": "polygon",
+      "feature_count": 188,
+      "source_class": "official",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/old-growth/usda_mature_old_growth_firesheds_idaho_map.geojson"
+        },
+        "source": {
+          "type": "geojson",
+          "path": "data/old-growth/usda_mature_old_growth_firesheds_idaho.geojson"
+        }
+      }
+    },
+    {
+      "id": "rockhounding-research",
+      "label": "Rockhounding Research",
+      "group": "rockhounding",
+      "scope": "idaho-research",
+      "geometry": "point",
+      "feature_count": 1,
+      "source_class": "user-researched",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/rockhounding/onx_rockhounding_research_points_idaho.geojson"
+        }
+      }
+    },
+    {
+      "id": "trails-woodriver-sawtooth",
+      "label": "Trails — Wood River / Sawtooth",
+      "group": "trails",
+      "scope": "regional",
+      "geometry": "line",
+      "source_class": "official",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/trails/usfs_trails_woodriver_sawtooth_map.geojson"
+        },
+        "source": {
+          "type": "geojson",
+          "path": "data/trails/usfs_trails_woodriver_sawtooth.geojson"
+        }
+      }
+    },
+    {
+      "id": "trails-warm-springs-bonneville",
+      "label": "Trails — Warm Springs / Bonneville",
+      "group": "trails",
+      "scope": "regional",
+      "geometry": "line",
+      "source_class": "official",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/trails/usfs_trails_warm_springs_bonneville_map.geojson"
+        },
+        "source": {
+          "type": "geojson",
+          "path": "data/trails/usfs_trails_warm_springs_bonneville.geojson"
+        }
+      }
+    }
+  ]
+}
