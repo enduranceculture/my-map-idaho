@@ -1,9 +1,13 @@
 """Build authoritative Idaho foundation layers from public GIS sources.
 
-The script intentionally avoids ArcGIS spatial filters for the mature/old-growth
-service because that endpoint has intermittently rejected spatial queries even
-while ordinary pagination remained healthy. Instead it downloads authoritative
-features in stable pages and clips them locally to Idaho.
+Forest and wilderness layers use a small Idaho bounding-box prefilter for speed,
+then are clipped to the exact Census Idaho polygon locally. If a service rejects
+that spatial query, the script falls back to ordinary national pagination.
+
+The USDA mature/old-growth endpoint is handled differently on purpose: Forest
+Atlas observed that its spatial and IDs-only queries can fail even while ordinary
+pagination remains healthy. We therefore paginate that source nationally and
+clip it locally to Idaho.
 
 Outputs:
   data/boundaries/idaho_census_2025.geojson
@@ -18,7 +22,6 @@ Outputs:
 from __future__ import annotations
 
 import json
-import os
 import time
 import urllib.parse
 import urllib.request
@@ -42,6 +45,7 @@ IDAHO_BOUNDARY_SOURCE = (
 IDAHO_BOUNDARY_SOURCE_URL = (
     "https://www2.census.gov/geo/tiger/GENZ2025/shp/cb_2025_us_state_500k.zip"
 )
+IDAHO_QUERY_BBOX = "-117.30,41.90,-111.00,49.10"
 
 SOURCES = {
     "forests": {
@@ -54,7 +58,8 @@ SOURCES = {
             "objectid,adminforestid,region,forestnumber,forestorgcode,"
             "forestname,gis_acres"
         ),
-        "page_size": 2000,
+        "page_size": 200,
+        "spatial_prefilter": True,
     },
     "wilderness": {
         "name": "USFS National Wilderness Areas",
@@ -66,7 +71,8 @@ SOURCES = {
             "objectid,wildernessid,wildernessname,areaid,boundarystatus,"
             "gis_acres,wid"
         ),
-        "page_size": 2000,
+        "page_size": 100,
+        "spatial_prefilter": True,
     },
     "old_growth": {
         "name": "USDA Forest Service Fireshed Mature and Old Growth Area",
@@ -80,6 +86,7 @@ SOURCES = {
             "Nine_Class,Trimmed_Area"
         ),
         "page_size": 200,
+        "spatial_prefilter": False,
     },
 }
 
@@ -158,7 +165,7 @@ def load_idaho_boundary() -> tuple[dict, object]:
     return normalized, geom
 
 
-def fetch_arcgis_features(config: dict) -> list[dict]:
+def _fetch_arcgis_pages(config: dict, use_spatial_prefilter: bool) -> list[dict]:
     query_url = config["url"].rstrip("/") + "/query"
     page_size = int(config["page_size"])
     fields = config["fields"]
@@ -176,12 +183,24 @@ def fetch_arcgis_features(config: dict) -> list[dict]:
             "resultRecordCount": str(page_size),
             "f": "geojson",
         }
-        payload = fetch_json(query_url + "?" + urllib.parse.urlencode(params))
+        if use_spatial_prefilter:
+            params.update(
+                {
+                    "geometry": IDAHO_QUERY_BBOX,
+                    "geometryType": "esriGeometryEnvelope",
+                    "inSR": "4326",
+                    "spatialRel": "esriSpatialRelIntersects",
+                }
+            )
+
+        url = query_url + "?" + urllib.parse.urlencode(params)
+        payload = fetch_json(url, retries=3 if use_spatial_prefilter else 6)
         page = payload.get("features") or []
         if not page:
             break
         features.extend(page)
-        print(f"{config['name']}: fetched {len(features)} features")
+        mode = "Idaho prefilter" if use_spatial_prefilter else "national fallback"
+        print(f"{config['name']} [{mode}]: fetched {len(features)} features")
         if len(page) < page_size:
             break
         offset += len(page)
@@ -189,6 +208,18 @@ def fetch_arcgis_features(config: dict) -> list[dict]:
     if not features:
         raise RuntimeError(f"{config['name']} returned zero features")
     return features
+
+
+def fetch_arcgis_features(config: dict) -> list[dict]:
+    if config.get("spatial_prefilter"):
+        try:
+            return _fetch_arcgis_pages(config, use_spatial_prefilter=True)
+        except Exception as exc:  # noqa: BLE001 - explicit robust fallback
+            print(
+                f"{config['name']}: Idaho spatial prefilter failed ({exc}); "
+                "falling back to national pagination"
+            )
+    return _fetch_arcgis_pages(config, use_spatial_prefilter=False)
 
 
 def polygonal_only(geometry):
@@ -245,7 +276,7 @@ def feature_collection(features: list[dict], source: dict) -> dict:
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "feature_count": len(features),
             "clip_boundary": IDAHO_BOUNDARY_SOURCE,
-            "method": "authoritative national ArcGIS pagination, then exact local clip to Idaho",
+            "method": "authoritative ArcGIS source, then exact local clip to Idaho",
         },
         "features": features,
     }
