@@ -4,10 +4,10 @@ Forest and wilderness layers use a small Idaho bounding-box prefilter for speed,
 then are clipped to the exact Census Idaho polygon locally. If a service rejects
 that spatial query, the script falls back to ordinary national pagination.
 
-The USDA mature/old-growth endpoint is handled differently on purpose: Forest
-Atlas observed that its spatial and IDs-only queries can fail even while ordinary
-pagination remains healthy. We therefore paginate that source nationally and
-clip it locally to Idaho.
+For mature/old-growth, the preferred route first queries the companion full
+Fireshed boundary layer for firesheds touching Idaho, then requests layer 29 by
+those authoritative Fireshed_Name values. This avoids the flaky spatial query on
+layer 29 itself. Full national layer-29 pagination remains the final fallback.
 
 Outputs:
   data/boundaries/idaho_census_2025.geojson
@@ -46,6 +46,10 @@ IDAHO_BOUNDARY_SOURCE_URL = (
     "https://www2.census.gov/geo/tiger/GENZ2025/shp/cb_2025_us_state_500k.zip"
 )
 IDAHO_QUERY_BBOX = "-117.30,41.90,-111.00,49.10"
+OLD_GROWTH_SERVICE = (
+    "https://apps.fs.usda.gov/fsgisx02/rest/services/wo_nfs_gstc/"
+    "WO_OSC_GapAnalysis_OldGrowthAndMatureForests/MapServer"
+)
 
 SOURCES = {
     "forests": {
@@ -74,12 +78,16 @@ SOURCES = {
         "page_size": 100,
         "spatial_prefilter": True,
     },
+    "fireshed_index": {
+        "name": "USDA Fireshed Boundaries (Full)",
+        "url": OLD_GROWTH_SERVICE + "/31",
+        "fields": "OBJECTID,Fireshed_Name",
+        "page_size": 200,
+        "spatial_prefilter": True,
+    },
     "old_growth": {
         "name": "USDA Forest Service Fireshed Mature and Old Growth Area",
-        "url": (
-            "https://apps.fs.usda.gov/fsgisx02/rest/services/wo_nfs_gstc/"
-            "WO_OSC_GapAnalysis_OldGrowthAndMatureForests/MapServer/29"
-        ),
+        "url": OLD_GROWTH_SERVICE + "/29",
         "fields": (
             "OBJECTID,Fireshed_Name,MajRegion,MATURE_ACRES,MATURE_SE_PERC,"
             "OLD_GROWTH_ACRES,OLD_GROWTH_SE_PERC,ForestType,Division,"
@@ -165,7 +173,9 @@ def load_idaho_boundary() -> tuple[dict, object]:
     return normalized, geom
 
 
-def _fetch_arcgis_pages(config: dict, use_spatial_prefilter: bool) -> list[dict]:
+def _fetch_arcgis_pages(
+    config: dict, use_spatial_prefilter: bool, where: str = "1=1"
+) -> list[dict]:
     query_url = config["url"].rstrip("/") + "/query"
     page_size = int(config["page_size"])
     fields = config["fields"]
@@ -174,7 +184,7 @@ def _fetch_arcgis_pages(config: dict, use_spatial_prefilter: bool) -> list[dict]
 
     while True:
         params = {
-            "where": "1=1",
+            "where": where,
             "outFields": fields,
             "returnGeometry": "true",
             "outSR": "4326",
@@ -199,7 +209,7 @@ def _fetch_arcgis_pages(config: dict, use_spatial_prefilter: bool) -> list[dict]
         if not page:
             break
         features.extend(page)
-        mode = "Idaho prefilter" if use_spatial_prefilter else "national fallback"
+        mode = "Idaho prefilter" if use_spatial_prefilter else "non-spatial"
         print(f"{config['name']} [{mode}]: fetched {len(features)} features")
         if len(page) < page_size:
             break
@@ -210,16 +220,53 @@ def _fetch_arcgis_pages(config: dict, use_spatial_prefilter: bool) -> list[dict]
     return features
 
 
-def fetch_arcgis_features(config: dict) -> list[dict]:
+def fetch_arcgis_features(config: dict, where: str = "1=1") -> list[dict]:
     if config.get("spatial_prefilter"):
         try:
-            return _fetch_arcgis_pages(config, use_spatial_prefilter=True)
+            return _fetch_arcgis_pages(config, use_spatial_prefilter=True, where=where)
         except Exception as exc:  # noqa: BLE001 - explicit robust fallback
             print(
                 f"{config['name']}: Idaho spatial prefilter failed ({exc}); "
                 "falling back to national pagination"
             )
-    return _fetch_arcgis_pages(config, use_spatial_prefilter=False)
+    return _fetch_arcgis_pages(config, use_spatial_prefilter=False, where=where)
+
+
+def _sql_quote(value: str) -> str:
+    return "'" + value.replace("'", "''") + "'"
+
+
+def fetch_idaho_old_growth_features() -> list[dict]:
+    """Use layer 31 as the spatial index, then query layer 29 by fireshed name."""
+    try:
+        index_features = fetch_arcgis_features(SOURCES["fireshed_index"])
+        names = sorted(
+            {
+                str((feature.get("properties") or {}).get("Fireshed_Name")).strip()
+                for feature in index_features
+                if (feature.get("properties") or {}).get("Fireshed_Name")
+            }
+        )
+        if not names:
+            raise RuntimeError("Idaho fireshed index returned no Fireshed_Name values")
+        print(f"Idaho fireshed index identified {len(names)} firesheds")
+
+        collected: list[dict] = []
+        chunk_size = 12
+        for start in range(0, len(names), chunk_size):
+            chunk = names[start : start + chunk_size]
+            where = "Fireshed_Name IN (" + ",".join(_sql_quote(name) for name in chunk) + ")"
+            collected.extend(fetch_arcgis_features(SOURCES["old_growth"], where=where))
+        if not collected:
+            raise RuntimeError("Targeted old-growth query returned no features")
+        print(f"Targeted old-growth query returned {len(collected)} candidate features")
+        return collected
+    except Exception as exc:  # noqa: BLE001 - final fallback is deliberate
+        print(
+            f"Targeted Idaho fireshed strategy failed ({exc}); "
+            "falling back to full national old-growth pagination"
+        )
+        return fetch_arcgis_features(SOURCES["old_growth"])
 
 
 def polygonal_only(geometry):
@@ -342,7 +389,7 @@ def main() -> None:
     )
 
     old_growth_features = clip_features(
-        fetch_arcgis_features(SOURCES["old_growth"]), boundary_geom, SOURCES["old_growth"]
+        fetch_idaho_old_growth_features(), boundary_geom, SOURCES["old_growth"]
     )
     save_layer(
         OLD_GROWTH_DIR / "usda_mature_old_growth_firesheds_idaho.geojson",
