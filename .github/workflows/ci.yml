@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Lint scripts
+        run: |
+          pip install --quiet ruff
+          ruff check scripts/
+
+      - name: Syntax check
+        run: python -m compileall -q scripts/
+
+      - name: Validate data layers
+        run: python scripts/validate_data.py
