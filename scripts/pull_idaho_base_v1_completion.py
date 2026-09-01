@@ -19,7 +19,14 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-from shapely.geometry import GeometryCollection, MultiPolygon, Point, Polygon, mapping, shape
+from shapely.geometry import (
+    GeometryCollection,
+    MultiPolygon,
+    Point,
+    Polygon,
+    mapping,
+    shape,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 BOUNDARY_PATH = ROOT / "data" / "boundaries" / "idaho_census_2025.geojson"
@@ -105,7 +112,12 @@ def query_ids(url: str, where: str = "1=1") -> list[int]:
     return ids
 
 
-def fetch_features(url: str, ids: list[int], fields: str, chunk_size: int = 700) -> list[dict]:
+def fetch_features(
+    url: str,
+    ids: list[int],
+    fields: str,
+    chunk_size: int = 700,
+) -> list[dict]:
     chunks = [ids[start : start + chunk_size] for start in range(0, len(ids), chunk_size)]
 
     def fetch_chunk(chunk: list[int]) -> list[dict]:
@@ -147,7 +159,11 @@ def polygonal_only(geometry):
     if isinstance(geometry, (Polygon, MultiPolygon)):
         return geometry
     if isinstance(geometry, GeometryCollection):
-        parts = [part for part in geometry.geoms if isinstance(part, (Polygon, MultiPolygon))]
+        parts = [
+            part
+            for part in geometry.geoms
+            if isinstance(part, (Polygon, MultiPolygon))
+        ]
         if not parts:
             return None
         merged = parts[0]
@@ -192,7 +208,12 @@ def clip_points(features: list[dict], boundary) -> list[dict]:
     return clipped
 
 
-def feature_collection(layer: str, source: str, features: list[dict], note: str) -> dict:
+def feature_collection(
+    layer: str,
+    source: str,
+    features: list[dict],
+    note: str,
+) -> dict:
     return {
         "type": "FeatureCollection",
         "metadata": {
@@ -277,8 +298,8 @@ def pull_padus(boundary) -> None:
     )
     source_name = "USGS Protected Areas Database of the United States (PAD-US) 4.1"
     note = (
-        "Fee/public-land manager view. Private, NGO, and unknown manager types are excluded "
-        "from this base public-land layer."
+        "Fee/public-land manager view. Private, NGO, and unknown manager types are "
+        "excluded from this base public-land layer."
     )
     write_geojson(
         BOUNDARY_DIR / "usgs_padus4_1_public_land_managers_idaho.geojson",
@@ -292,20 +313,23 @@ def pull_padus(boundary) -> None:
 
 def pull_ranger_districts(boundary) -> None:
     ids = query_ids(RANGER_URL)
-    clipped = clip_polygons(fetch_features(RANGER_URL, ids, "*", chunk_size=500), boundary)
+    clipped = clip_polygons(
+        fetch_features(RANGER_URL, ids, "*", chunk_size=500),
+        boundary,
+    )
     if not clipped:
         raise RuntimeError("USFS Ranger District layer clipped to zero features")
     map_features = simplify_polygons(
         clipped,
         (
-            "OBJECTID",
-            "DISTRICTNAME",
-            "DISTRICTNUMBER",
-            "FORESTNAME",
-            "FORESTORGCODE",
-            "REGION",
-            "REGIONNAME",
-            "GLOBALID",
+            "objectid",
+            "rangerdistrictid",
+            "region",
+            "forestnumber",
+            "forestname",
+            "districtnumber",
+            "districtname",
+            "districtorgcode",
         ),
     )
     source_name = "USFS EDW Ranger District Boundaries"
@@ -322,7 +346,10 @@ def pull_ranger_districts(boundary) -> None:
 
 def pull_rich_recreation(boundary) -> None:
     ids = query_ids(REC_SITE_URL)
-    clipped = clip_points(fetch_features(REC_SITE_URL, ids, REC_FIELDS, chunk_size=700), boundary)
+    clipped = clip_points(
+        fetch_features(REC_SITE_URL, ids, REC_FIELDS, chunk_size=700),
+        boundary,
+    )
     if not clipped:
         raise RuntimeError("USFS rich recreation layer clipped to zero features")
     map_features = slim_points(
@@ -348,13 +375,14 @@ def pull_rich_recreation(boundary) -> None:
     trailheads = [
         feature
         for feature in clipped
-        if str((feature.get("properties") or {}).get("site_type") or "").upper()
-        == "TRAILHEAD"
+        if "TRAILHEAD"
+        in str((feature.get("properties") or {}).get("site_type") or "").upper()
     ]
     source_name = "USFS EDW Recreation Infrastructure Sites"
     note = (
-        "Public-facing recreation infrastructure with activity/service lists, operations, "
-        "fees, seasons, permits, restrictions, water/restrooms, and directions when published."
+        "Public-facing recreation infrastructure with activity/service lists, "
+        "operations, fees, seasons, permits, restrictions, water/restrooms, and "
+        "directions when published."
     )
     write_geojson(
         ACCESS_DIR / "usfs_recreation_sites_rich_idaho.geojson",
