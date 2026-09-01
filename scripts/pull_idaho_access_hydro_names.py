@@ -38,7 +38,7 @@ ACCESS_DIR = ROOT / "data" / "access"
 HYDRO_DIR = ROOT / "data" / "hydro"
 PLACES_DIR = ROOT / "data" / "places"
 
-USER_AGENT = "my-map-idaho/1.1 (+https://github.com/enduranceculture/my-map-idaho)"
+USER_AGENT = "my-map-idaho/1.2 (+https://github.com/enduranceculture/my-map-idaho)"
 IDAHO_BBOX = (-117.30, 41.90, -111.00, 49.10)
 MAP_SIMPLIFY_TOLERANCE_DEGREES = 0.00004  # roughly 3-4 m in Idaho
 
@@ -209,6 +209,17 @@ def collect_source_ids(config: dict) -> list[int]:
         ids = sorted(set(query_ids(config)))
         print(f"{config['name']}: {len(ids)} Idaho IDs")
         return ids
+
+    # returnIdsOnly is not constrained by the normal feature maxRecordCount, so
+    # prefer one inexpensive Idaho-envelope query. Tile only if a service rejects it.
+    try:
+        ids = sorted(set(query_ids(config, bbox=IDAHO_BBOX)))
+        if not ids:
+            raise RuntimeError("full Idaho envelope returned zero IDs")
+        print(f"{config['name']}: {len(ids)} IDs from one Idaho envelope query")
+        return ids
+    except Exception as exc:  # noqa: BLE001 - explicit resilient fallback
+        print(f"{config['name']}: full-envelope ID query failed ({exc}); using tiles")
 
     all_ids: set[int] = set()
     tiles = tile_bboxes()
