@@ -1,20 +1,14 @@
 """Build high-value Idaho access, hydrography, and named-place layers.
 
 This repository is an intelligence layer, not a basemap replacement. The script
-therefore prioritizes authoritative information that adds value on top of a
-Mapbox/USGS-style basemap:
+prioritizes authoritative information that adds useful, queryable context above
+whatever visual basemap a consuming app chooses.
 
-- USFS National Forest System roads, preserving useful access attributes while
-  simplifying geometry for browser use.
-- USFS Recreation Opportunities, plus a trailhead-focused derivative.
-- USGS 3D Hydrography Program named flowlines and named waterbodies, plus springs.
-- USGS GNIS / National Map Gazetteer landform names (summits, gaps, valleys,
-  canyons, ridges, etc.).
-
-All geometry is filtered to Idaho using the exact Census boundary already stored
-in data/boundaries/idaho_census_2025.geojson. Large line/polygon services are
-queried in overlapping-safe Idaho tiles and deduplicated by source OBJECTID to
-avoid fragile national downloads.
+Large ArcGIS layers use an ID-first strategy: query only object IDs intersecting
+Idaho, deduplicate those IDs, then fetch geometry in manageable POST batches.
+That avoids slow/fragile geometry pagination across national services. All
+features are finally clipped to the exact Census Idaho polygon stored in this
+repository.
 """
 
 from __future__ import annotations
@@ -44,7 +38,7 @@ ACCESS_DIR = ROOT / "data" / "access"
 HYDRO_DIR = ROOT / "data" / "hydro"
 PLACES_DIR = ROOT / "data" / "places"
 
-USER_AGENT = "my-map-idaho/1.0 (+https://github.com/enduranceculture/my-map-idaho)"
+USER_AGENT = "my-map-idaho/1.1 (+https://github.com/enduranceculture/my-map-idaho)"
 IDAHO_BBOX = (-117.30, 41.90, -111.00, 49.10)
 MAP_SIMPLIFY_TOLERANCE_DEGREES = 0.00004  # roughly 3-4 m in Idaho
 
@@ -59,10 +53,9 @@ SOURCES = {
             "primary_maintainer,admin_org,service_life,level_of_service,"
             "pfsr_classification,managing_org,openforuseto,ivm_symbol,globalid"
         ),
-        "oid": "objectid",
-        "page_size": 1200,
+        "chunk_size": 800,
         "tiled": True,
-        "source_note": "USFS EDW roads are kept current from Forest Service source geodatabases.",
+        "source_note": "USFS EDW National Forest System Roads.",
     },
     "recreation": {
         "name": "USFS Recreation Opportunities",
@@ -73,10 +66,9 @@ SOURCES = {
             "feedescription,operational_hours,reservation_info,restrictions,"
             "accessibility,openstatus,open_season_start,open_season_end,infra_cn"
         ),
-        "oid": "objectid",
-        "page_size": 1500,
+        "chunk_size": 1000,
         "tiled": True,
-        "source_note": "Published USFS recreation data is refreshed nightly from the Recreation Portal feed.",
+        "source_note": "USFS Recreation Opportunities; upstream feed is refreshed nightly.",
     },
     "flowlines": {
         "name": "USGS 3D Hydrography Program Flowline",
@@ -86,11 +78,10 @@ SOURCES = {
             "featuretypelabel,lengthkm,flowdirection,flowdirectionlabel,onsurface,"
             "onsurfacelabel,streamlevel,streamorder,hydrosequence,workunitid"
         ),
-        "oid": "OBJECTID",
-        "page_size": 1800,
+        "chunk_size": 900,
         "tiled": True,
         "where": "gnisid IS NOT NULL",
-        "source_note": "USGS 3DHP national service; named flowlines only for this intelligence layer.",
+        "source_note": "USGS 3DHP; named flowlines only for this intelligence layer.",
     },
     "waterbodies": {
         "name": "USGS 3D Hydrography Program Waterbody",
@@ -99,11 +90,10 @@ SOURCES = {
             "OBJECTID,id3dhp,featuredate,mainstemid,gnisid,gnisidlabel,featuretype,"
             "featuretypelabel,areasqkm,workunitid"
         ),
-        "oid": "OBJECTID",
-        "page_size": 1800,
+        "chunk_size": 900,
         "tiled": True,
         "where": "gnisid IS NOT NULL",
-        "source_note": "USGS 3DHP national service; named waterbodies only for this intelligence layer.",
+        "source_note": "USGS 3DHP; named waterbodies only for this intelligence layer.",
     },
     "springs": {
         "name": "USGS 3D Hydrography Program Springs",
@@ -112,8 +102,7 @@ SOURCES = {
             "OBJECTID,id3dhp,featuredate,mainstemid,universalreferenceid,gnisid,"
             "gnisidlabel,featuretype,featuretypelabel,workunitid"
         ),
-        "oid": "OBJECTID",
-        "page_size": 1800,
+        "chunk_size": 1000,
         "tiled": True,
         "where": "featuretype = 7",
         "source_note": "USGS 3DHP HydroLocation records classified as Spring.",
@@ -125,8 +114,7 @@ SOURCES = {
             "OBJECTID,gaz_id,gaz_name,gaz_featureclass,state_alpha,county_name,"
             "isunknowncoords,fcode"
         ),
-        "oid": "OBJECTID",
-        "page_size": 1800,
+        "chunk_size": 1000,
         "tiled": False,
         "where": "state_alpha = 'ID'",
         "source_note": "GNIS is the federal and national standard for geographic nomenclature.",
@@ -134,22 +122,32 @@ SOURCES = {
 }
 
 
-def fetch_json(url: str, retries: int = 5, timeout: int = 120) -> dict:
+def request_json(url: str, params: dict, retries: int = 3, timeout: int = 75) -> dict:
+    """POST an ArcGIS query with bounded retries and fail closed on service errors."""
+    body = urllib.parse.urlencode(params).encode("utf-8")
     last_error: Exception | None = None
     for attempt in range(retries):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+            req = urllib.request.Request(
+                url,
+                data=body,
+                headers={
+                    "User-Agent": USER_AGENT,
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                method="POST",
+            )
             with urllib.request.urlopen(req, timeout=timeout) as response:
                 payload = json.loads(response.read().decode("utf-8"))
             if isinstance(payload, dict) and payload.get("error"):
                 raise RuntimeError(json.dumps(payload["error"], sort_keys=True))
             return payload
-        except Exception as exc:  # noqa: BLE001 - network/service retry is deliberate
+        except Exception as exc:  # noqa: BLE001 - retry network/service failures
             last_error = exc
             if attempt == retries - 1:
                 break
-            time.sleep(min(2**attempt, 16))
-    raise RuntimeError(f"Failed to fetch {url}: {last_error}")
+            time.sleep(min(2**attempt, 8))
+    raise RuntimeError(f"Failed ArcGIS request to {url}: {last_error}")
 
 
 def write_json(path: Path, payload: dict) -> None:
@@ -175,82 +173,88 @@ def tile_bboxes(cols: int = 3, rows: int = 4) -> list[tuple[float, float, float,
     xmin, ymin, xmax, ymax = IDAHO_BBOX
     dx = (xmax - xmin) / cols
     dy = (ymax - ymin) / rows
-    tiles = []
-    for row in range(rows):
-        for col in range(cols):
-            tiles.append(
-                (
-                    xmin + col * dx,
-                    ymin + row * dy,
-                    xmin + (col + 1) * dx,
-                    ymin + (row + 1) * dy,
-                )
-            )
-    return tiles
+    return [
+        (
+            xmin + col * dx,
+            ymin + row * dy,
+            xmin + (col + 1) * dx,
+            ymin + (row + 1) * dy,
+        )
+        for row in range(rows)
+        for col in range(cols)
+    ]
 
 
-def _query_pages(config: dict, where: str, bbox=None) -> list[dict]:
+def query_ids(config: dict, bbox=None) -> list[int]:
+    params = {
+        "where": config.get("where", "1=1"),
+        "returnIdsOnly": "true",
+        "f": "json",
+    }
+    if bbox is not None:
+        params.update(
+            {
+                "geometry": ",".join(f"{value:.6f}" for value in bbox),
+                "geometryType": "esriGeometryEnvelope",
+                "inSR": "4326",
+                "spatialRel": "esriSpatialRelIntersects",
+            }
+        )
+    payload = request_json(config["url"].rstrip("/") + "/query", params)
+    return [int(value) for value in (payload.get("objectIds") or [])]
+
+
+def collect_source_ids(config: dict) -> list[int]:
+    if not config.get("tiled"):
+        ids = sorted(set(query_ids(config)))
+        print(f"{config['name']}: {len(ids)} Idaho IDs")
+        return ids
+
+    all_ids: set[int] = set()
+    tiles = tile_bboxes()
+    for index, bbox in enumerate(tiles, start=1):
+        ids = query_ids(config, bbox=bbox)
+        all_ids.update(ids)
+        print(
+            f"{config['name']}: ID tile {index}/{len(tiles)} -> {len(ids)} IDs; "
+            f"{len(all_ids)} unique total"
+        )
+    return sorted(all_ids)
+
+
+def fetch_features_by_ids(config: dict, object_ids: list[int]) -> list[dict]:
+    if not object_ids:
+        raise RuntimeError(f"{config['name']} returned zero Idaho IDs")
+
     query_url = config["url"].rstrip("/") + "/query"
-    offset = 0
+    chunk_size = int(config["chunk_size"])
     features: list[dict] = []
-    page_size = int(config["page_size"])
-
-    while True:
-        params = {
-            "where": where,
-            "outFields": config["fields"],
-            "returnGeometry": "true",
-            "outSR": "4326",
-            "orderByFields": f"{config['oid']} ASC",
-            "resultOffset": str(offset),
-            "resultRecordCount": str(page_size),
-            "geometryPrecision": "6",
-            "f": "geojson",
-        }
-        if bbox is not None:
-            params.update(
-                {
-                    "geometry": ",".join(f"{value:.6f}" for value in bbox),
-                    "geometryType": "esriGeometryEnvelope",
-                    "inSR": "4326",
-                    "spatialRel": "esriSpatialRelIntersects",
-                }
-            )
-
-        payload = fetch_json(query_url + "?" + urllib.parse.urlencode(params))
+    for start in range(0, len(object_ids), chunk_size):
+        chunk = object_ids[start : start + chunk_size]
+        payload = request_json(
+            query_url,
+            {
+                "objectIds": ",".join(str(value) for value in chunk),
+                "outFields": config["fields"],
+                "returnGeometry": "true",
+                "outSR": "4326",
+                "geometryPrecision": "7",
+                "f": "geojson",
+            },
+        )
         page = payload.get("features") or []
-        if not page:
-            break
         features.extend(page)
-        if len(page) < page_size:
-            break
-        offset += len(page)
+        print(
+            f"{config['name']}: fetched {min(start + len(chunk), len(object_ids))}/"
+            f"{len(object_ids)} IDs -> {len(features)} features"
+        )
+    if not features:
+        raise RuntimeError(f"{config['name']} returned zero features for Idaho IDs")
     return features
 
 
 def fetch_source(config: dict) -> list[dict]:
-    where = config.get("where", "1=1")
-    if not config.get("tiled"):
-        features = _query_pages(config, where)
-        print(f"{config['name']}: fetched {len(features)} records")
-        return features
-
-    by_oid: dict[str, dict] = {}
-    for idx, bbox in enumerate(tile_bboxes(), start=1):
-        page = _query_pages(config, where, bbox=bbox)
-        for feature in page:
-            props = feature.get("properties") or {}
-            key = str(props.get(config["oid"]) or feature.get("id") or "")
-            if key:
-                by_oid[key] = feature
-        print(
-            f"{config['name']}: tile {idx}/12 -> {len(page)} records; "
-            f"{len(by_oid)} unique total"
-        )
-    features = list(by_oid.values())
-    if not features:
-        raise RuntimeError(f"{config['name']} returned zero records")
-    return features
+    return fetch_features_by_ids(config, collect_source_ids(config))
 
 
 def _linear_only(geom):
@@ -281,7 +285,7 @@ def _pointlike_only(geom):
 
 
 def clip_features(features: list[dict], boundary, kind: str, source: dict) -> list[dict]:
-    output = []
+    output: list[dict] = []
     for feature in features:
         geometry = feature.get("geometry")
         if not geometry:
@@ -292,17 +296,14 @@ def clip_features(features: list[dict], boundary, kind: str, source: dict) -> li
         if geom.is_empty or not geom.intersects(boundary):
             continue
 
-        if kind == "point":
-            result = _pointlike_only(geom.intersection(boundary))
-        elif kind == "line":
-            result = _linear_only(geom.intersection(boundary))
-        elif kind == "polygon":
-            result = _polygonal_only(geom.intersection(boundary))
-        else:
-            raise ValueError(kind)
-
+        result = {
+            "point": _pointlike_only,
+            "line": _linear_only,
+            "polygon": _polygonal_only,
+        }[kind](geom.intersection(boundary))
         if result is None or result.is_empty:
             continue
+
         props = dict(feature.get("properties") or {})
         props.update(
             {
@@ -311,7 +312,9 @@ def clip_features(features: list[dict], boundary, kind: str, source: dict) -> li
                 "scope": "Idaho",
             }
         )
-        output.append({"type": "Feature", "properties": props, "geometry": mapping(result)})
+        output.append(
+            {"type": "Feature", "properties": props, "geometry": mapping(result)}
+        )
     return output
 
 
@@ -324,12 +327,15 @@ def collection(features: list[dict], source: dict, layer: str, **metadata) -> di
         "source_note": source["source_note"],
         "feature_count": len(features),
         "clip_boundary": "US Census Bureau 2025 Idaho Cartographic Boundary",
+        "retrieval_method": "ArcGIS ID-first spatial selection, chunked feature fetch, exact local Idaho clip",
     }
     base.update(metadata)
     return {"type": "FeatureCollection", "metadata": base, "features": features}
 
 
-def simplify_features(features: list[dict], tolerance=MAP_SIMPLIFY_TOLERANCE_DEGREES) -> list[dict]:
+def simplify_features(
+    features: list[dict], tolerance: float = MAP_SIMPLIFY_TOLERANCE_DEGREES
+) -> list[dict]:
     result = []
     for feature in features:
         geom = shape(feature["geometry"])
@@ -401,33 +407,30 @@ def aggregate_recreation(features: list[dict]) -> list[dict]:
     ]
     for key, records in groups.items():
         props = {field: first_nonempty(records, field) for field in copy_fields}
-        activities = sorted(
-            {
-                str(record.get("markeractivity")).strip()
-                for record in records
-                if record.get("markeractivity")
-            }
-        )
-        groups_seen = sorted(
-            {
-                str(record.get("markeractivitygroup")).strip()
-                for record in records
-                if record.get("markeractivitygroup")
-            }
-        )
-        marker_types = sorted(
-            {
-                str(record.get("markertype")).strip()
-                for record in records
-                if record.get("markertype")
-            }
-        )
         props.update(
             {
                 "site_id": f"usfs-rec:{key}",
-                "activities": activities,
-                "activity_groups": groups_seen,
-                "marker_types": marker_types,
+                "activities": sorted(
+                    {
+                        str(record.get("markeractivity")).strip()
+                        for record in records
+                        if record.get("markeractivity")
+                    }
+                ),
+                "activity_groups": sorted(
+                    {
+                        str(record.get("markeractivitygroup")).strip()
+                        for record in records
+                        if record.get("markeractivitygroup")
+                    }
+                ),
+                "marker_types": sorted(
+                    {
+                        str(record.get("markertype")).strip()
+                        for record in records
+                        if record.get("markertype")
+                    }
+                ),
                 "source": SOURCES["recreation"]["name"],
                 "source_url": SOURCES["recreation"]["url"],
                 "scope": "Idaho",
@@ -478,23 +481,30 @@ def main() -> None:
     HYDRO_DIR.mkdir(parents=True, exist_ok=True)
     PLACES_DIR.mkdir(parents=True, exist_ok=True)
 
-    # ACCESS — every USFS road segment, map-simplified but with source attributes.
     roads = normalize_roads(
         clip_features(fetch_source(SOURCES["roads"]), boundary, "line", SOURCES["roads"])
     )
-    roads_map = simplify_features(roads)
+    write_json(
+        ACCESS_DIR / "usfs_roads_idaho.geojson",
+        collection(
+            roads,
+            SOURCES["roads"],
+            "usfs-roads",
+            map_facing=False,
+            geometry_precision="WGS84 service output retained to 7 decimal places",
+        ),
+    )
     write_json(
         ACCESS_DIR / "usfs_roads_idaho_map.geojson",
         collection(
-            roads_map,
+            simplify_features(roads),
             SOURCES["roads"],
             "usfs-roads",
             map_facing=True,
             simplification_tolerance_degrees=MAP_SIMPLIFY_TOLERANCE_DEGREES,
-            source_truth="USFS live EDW service; geometry simplified only for delivery",
         ),
     )
-    print(f"saved USFS roads: {len(roads_map)} Idaho segments")
+    print(f"saved USFS roads: {len(roads)} Idaho segments")
 
     recreation_raw = clip_features(
         fetch_source(SOURCES["recreation"]), boundary, "point", SOURCES["recreation"]
@@ -521,7 +531,6 @@ def main() -> None:
     )
     print(f"saved recreation sites: {len(recreation)}; trailheads: {len(trailheads)}")
 
-    # HYDRO — named geometry is intelligence; the basemap still owns generic water rendering.
     named_flowlines = normalize_hydro(
         clip_features(
             fetch_source(SOURCES["flowlines"]), boundary, "line", SOURCES["flowlines"]
@@ -568,7 +577,9 @@ def main() -> None:
     )
 
     springs = normalize_hydro(
-        clip_features(fetch_source(SOURCES["springs"]), boundary, "point", SOURCES["springs"]),
+        clip_features(
+            fetch_source(SOURCES["springs"]), boundary, "point", SOURCES["springs"]
+        ),
         "spring",
     )
     write_json(
@@ -580,7 +591,6 @@ def main() -> None:
         f"named waterbodies: {len(named_waterbodies)}; springs: {len(springs)}"
     )
 
-    # PLACES — authoritative federal names for physical landforms.
     landforms = normalize_landforms(
         clip_features(
             fetch_source(SOURCES["landforms"]), boundary, "point", SOURCES["landforms"]
