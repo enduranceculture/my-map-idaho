@@ -19,6 +19,7 @@ BASE = "https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_TrailNFSPublish_01/M
 REGIONS = {
     "woodriver_sawtooth": "-115.2,43.3,-114.0,44.3",
     # Tight context window around Sammy's Warm Springs TH -> Bonneville Hot Springs ride.
+    # This is the authoritative geographic context source for Sammy's Trail Art.
     # Kept deliberately small so poster apps can pull accurate nearby trail context
     # without shipping the much larger Wood River / Sawtooth layer.
     "warm_springs_bonneville": "-115.40,44.08,-115.20,44.36",
