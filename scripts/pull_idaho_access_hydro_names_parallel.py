@@ -7,7 +7,8 @@ not maintained for passenger cars — then replaces serial chunk retrieval with
 bounded parallel requests.
 """
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import as_completed, ThreadPoolExecutor
+
 import pull_idaho_access_hydro_names as pipeline
 
 
