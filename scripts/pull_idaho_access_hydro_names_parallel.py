@@ -8,7 +8,6 @@ bounded parallel requests.
 """
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
 import pull_idaho_access_hydro_names as pipeline
 
 
@@ -17,7 +16,9 @@ MAX_WORKERS = 4
 # High-value access intelligence, not every administrative road geometry.
 # 517 paved; 518 gravel passenger-car; 515 dirt passenger-car;
 # 106 not maintained for passenger cars / typically rougher access.
-pipeline.SOURCES["roads"]["where"] = "symbol_code IN (106,515,517,518)"
+pipeline.SOURCES["roads"]["where"] = (
+    "symbol_code IN ('106','515','517','518')"
+)
 
 
 def parallel_fetch_features_by_ids(config: dict, object_ids: list[int]) -> list[dict]:
