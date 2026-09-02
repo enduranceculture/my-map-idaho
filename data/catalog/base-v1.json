@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "catalog_id": "my-map-idaho-base-v1",
-  "snapshot_date": "2026-09-01",
+  "snapshot_date": "2026-09-02",
   "repository": "enduranceculture/my-map-idaho",
   "raw_base": "https://raw.githubusercontent.com/enduranceculture/my-map-idaho/main/",
   "purpose": "Stable machine-readable delivery catalog for consuming map applications. Cartography, colors, visibility, zoom behavior, and interaction remain app concerns.",
