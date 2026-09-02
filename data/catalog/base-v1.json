@@ -237,6 +237,22 @@
       }
     },
     {
+      "id": "mountain-ranges",
+      "label": "Mountain Ranges",
+      "group": "places",
+      "scope": "idaho-and-border-context",
+      "geometry": "point",
+      "feature_count": 19,
+      "source_class": "official-curated",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/places/idaho_mountain_range_labels_v1.geojson"
+        }
+      },
+      "notes": "Official GNIS names with deliberately curated point anchors and visual hierarchy. Points support cartographic labels and do not claim surveyed range boundaries."
+    },
+    {
       "id": "old-growth-research",
       "label": "Old Growth Research",
       "group": "old-growth",

@@ -22,6 +22,7 @@ The visual basemap itself should still come from a mapping provider / map servic
 | Recreation / trailheads | **Live statewide** | USFS Recreation Opportunities + Recreation Infrastructure | `data/access/` |
 | Named hydrography | **Live statewide** | USGS 3D Hydrography Program (3DHP) | `data/hydro/` |
 | Named physical landforms | **Live statewide** | USGS GNIS / The National Map Gazetteer | `data/places/` |
+| Curated mountain-range labels | **Live / curated** | 19 official GNIS ranges with Idaho and immediate border context | `data/places/` |
 | Old-growth research points | **Live** | Researched onX waypoints accepted for this map | `data/old-growth/` |
 | Mature / old-growth landscape inventory | **Live statewide** | USDA Forest Service Fireshed Mature and Old Growth Area | `data/old-growth/` |
 | Rockhounding | **Partial / live** | Researched onX point(s); thematic enrichment later | `data/rockhounding/` |
@@ -48,6 +49,7 @@ Current authoritative / derived feature counts:
 | USGS 3DHP named waterbodies | 1,907 |
 | USGS 3DHP springs | 12,836 |
 | USGS GNIS physical landforms | 8,374 |
+| Curated mountain-range labels | 19 |
 | Researched old-growth / ancient-tree points | 15 |
 | USDA Mature / Old-Growth Fireshed features | 188 |
 

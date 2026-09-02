@@ -1,0 +1,348 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "layer": "mountain-ranges",
+    "scope": "Idaho and immediate border context",
+    "feature_count": 19,
+    "snapshot_date": "2026-09-02",
+    "source": "USGS Geographic Names Information System (GNIS) / The National Map Gazetteer",
+    "source_url": "https://carto-wfs.nationalmap.gov/arcgis/rest/services/geonames/FeatureServer/2",
+    "supplemental_source": "USDA Forest Service Boulder / White Cloud documentation and owner-approved local naming context",
+    "accuracy_policy": "Names and GNIS identifiers preserve official nomenclature. Geometry is a curated point anchor for cartographic labels, not a surveyed range boundary. Border-context features are explicitly identified.",
+    "hierarchy_policy": "label_tier controls visual hierarchy only; it does not assert an unsupported geologic parent/sub-range relationship."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-115.401653, 47.212635] },
+      "properties": {
+        "id": "range:gnis:395685",
+        "name": "Bitterroot Range",
+        "official_name": "Bitterroot Range",
+        "local_alias": "The Bitterroots",
+        "display_name": "Bitterroot Range",
+        "label_tier": "statewide",
+        "context": "Idaho / Montana border",
+        "gnis_id": 395685,
+        "source": "USGS GNIS",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "mean of published GNIS multipoints",
+        "position_status": "derived cartographic anchor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-115.184296, 45.600474] },
+      "properties": {
+        "id": "range:gnis:394061",
+        "name": "Clearwater Mountains",
+        "official_name": "Clearwater Mountains",
+        "display_name": "Clearwater Mountains",
+        "label_tier": "statewide",
+        "context": "Idaho",
+        "gnis_id": 394061,
+        "source": "USGS GNIS",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "published GNIS point",
+        "position_status": "official feature location used as cartographic anchor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-114.273854, 45.098108] },
+      "properties": {
+        "id": "range:gnis:389859",
+        "name": "Salmon River Mountains",
+        "official_name": "Salmon River Mountains",
+        "display_name": "Salmon River Mountains",
+        "label_tier": "statewide",
+        "context": "Idaho",
+        "gnis_id": 389859,
+        "source": "USGS GNIS",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "mean of published GNIS multipoints",
+        "position_status": "derived cartographic anchor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-115.50122, 43.750179] },
+      "properties": {
+        "id": "range:gnis:393856",
+        "name": "Boise Mountains",
+        "official_name": "Boise Mountains",
+        "display_name": "Boise Mountains",
+        "label_tier": "statewide",
+        "context": "Idaho",
+        "gnis_id": 393856,
+        "source": "USGS GNIS",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "published GNIS point",
+        "position_status": "official feature location used as cartographic anchor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-116.897811, 43.296353] },
+      "properties": {
+        "id": "range:gnis:374291",
+        "name": "Owyhee Mountains",
+        "official_name": "Owyhee Mountains",
+        "display_name": "Owyhee Mountains",
+        "label_tier": "statewide",
+        "context": "Idaho / Oregon border",
+        "gnis_id": 374291,
+        "source": "USGS GNIS",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "mean of published GNIS multipoints",
+        "position_status": "derived cartographic anchor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-116.771732, 48.507953] },
+      "properties": {
+        "id": "range:gnis:395889",
+        "name": "Selkirk Mountains",
+        "official_name": "Selkirk Mountains",
+        "display_name": "Selkirk Mountains",
+        "label_tier": "statewide",
+        "context": "Idaho / Washington / Canada context",
+        "gnis_id": 395889,
+        "source": "USGS GNIS",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "mean of published GNIS multipoints",
+        "position_status": "derived cartographic anchor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-115.015652, 44.087963] },
+      "properties": {
+        "id": "range:gnis:389996",
+        "name": "Sawtooth Range",
+        "official_name": "Sawtooth Range",
+        "local_alias": "The Sawtooths",
+        "display_name": "Sawtooth Range",
+        "label_tier": "regional",
+        "context": "Central Idaho",
+        "gnis_id": 389996,
+        "source": "USGS GNIS",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "mean of published GNIS multipoints",
+        "position_status": "derived cartographic anchor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-113.651238, 44.151449] },
+      "properties": {
+        "id": "range:gnis:386181",
+        "name": "Lost River Range",
+        "official_name": "Lost River Range",
+        "display_name": "Lost River Range",
+        "label_tier": "regional",
+        "context": "East-central Idaho",
+        "gnis_id": 386181,
+        "source": "USGS GNIS",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "mean of published GNIS multipoints",
+        "position_status": "derived cartographic anchor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-113.465738, 44.501386] },
+      "properties": {
+        "id": "range:gnis:384569",
+        "name": "Lemhi Range",
+        "official_name": "Lemhi Range",
+        "display_name": "Lemhi Range",
+        "label_tier": "regional",
+        "context": "East-central Idaho",
+        "gnis_id": 384569,
+        "source": "USGS GNIS",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "mean of published GNIS multipoints",
+        "position_status": "derived cartographic anchor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-116.554438, 45.262378] },
+      "properties": {
+        "id": "range:gnis:390116",
+        "name": "Seven Devils Mountains",
+        "official_name": "Seven Devils Mountains",
+        "local_alias": "Seven Devils",
+        "display_name": "Seven Devils",
+        "label_tier": "regional",
+        "context": "West-central Idaho",
+        "gnis_id": 390116,
+        "source": "USGS GNIS",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "mean of published GNIS multipoints",
+        "position_status": "derived cartographic anchor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-111.370772, 43.22659] },
+      "properties": {
+        "id": "range:gnis:378928",
+        "name": "Caribou Range",
+        "official_name": "Caribou Range",
+        "display_name": "Caribou Range",
+        "label_tier": "regional",
+        "context": "Southeastern Idaho",
+        "gnis_id": 378928,
+        "source": "USGS GNIS",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "mean of published GNIS multipoints",
+        "position_status": "derived cartographic anchor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-113.186364, 44.784092] },
+      "properties": {
+        "id": "range:gnis:377296",
+        "name": "Beaverhead Mountains",
+        "official_name": "Beaverhead Mountains",
+        "display_name": "Beaverhead Mountains",
+        "label_tier": "regional",
+        "context": "Idaho / Montana border",
+        "gnis_id": 377296,
+        "source": "USGS GNIS",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "mean of published GNIS multipoints",
+        "position_status": "derived cartographic anchor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-115.689064, 48.222962] },
+      "properties": {
+        "id": "range:gnis:378670",
+        "name": "Cabinet Mountains",
+        "official_name": "Cabinet Mountains",
+        "local_alias": "The Cabinets",
+        "display_name": "Cabinet Mountains",
+        "label_tier": "regional",
+        "context": "Idaho / Montana border context",
+        "gnis_id": 378670,
+        "source": "USGS GNIS",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "published GNIS feature location",
+        "position_status": "border-context cartographic anchor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-110.884117, 43.751323] },
+      "properties": {
+        "id": "range:gnis:1930553",
+        "name": "Teton Range",
+        "official_name": "Teton Range",
+        "local_alias": "The Tetons",
+        "display_name": "Teton Range",
+        "label_tier": "regional",
+        "context": "Wyoming border context east of Idaho",
+        "gnis_id": 1930553,
+        "source": "USGS GNIS",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "published GNIS point",
+        "position_status": "border-context official feature location"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-111.031, 43.4472] },
+      "properties": {
+        "id": "range:gnis:1604349",
+        "name": "Snake River Range",
+        "official_name": "Snake River Range",
+        "display_name": "Snake River Range",
+        "label_tier": "regional",
+        "context": "Idaho / Wyoming border context",
+        "gnis_id": 1604349,
+        "source": "USGS GNIS",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "mean of published GNIS multipoints",
+        "position_status": "border-context cartographic anchor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-114.614441, 43.631392] },
+      "properties": {
+        "id": "range:gnis:390717",
+        "name": "Smoky Mountains",
+        "official_name": "Smoky Mountains",
+        "local_alias": "The Smokies",
+        "display_name": "Smoky Mountains",
+        "label_tier": "local",
+        "context": "Ketchum region",
+        "gnis_id": 390717,
+        "source": "USGS GNIS; owner-confirmed local alias",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "mean of published GNIS multipoints",
+        "position_status": "derived cartographic anchor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-113.965683, 43.598366] },
+      "properties": {
+        "id": "range:gnis:376219",
+        "name": "Pioneer Mountains",
+        "official_name": "Pioneer Mountains",
+        "local_alias": "The Pioneers",
+        "display_name": "Pioneer Mountains",
+        "label_tier": "local",
+        "context": "Ketchum region",
+        "gnis_id": 376219,
+        "source": "USGS GNIS; owner-confirmed local alias",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "mean of published GNIS multipoints",
+        "position_status": "derived cartographic anchor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-114.470245, 43.85348] },
+      "properties": {
+        "id": "range:gnis:378108",
+        "name": "Boulder Mountains",
+        "official_name": "Boulder Mountains",
+        "local_alias": "The Boulders",
+        "display_name": "Boulder Mountains",
+        "label_tier": "local",
+        "context": "Ketchum region",
+        "gnis_id": 378108,
+        "source": "USGS GNIS; owner-confirmed local alias",
+        "source_url": "https://www.usgs.gov/tools/geographic-names-information-system-gnis",
+        "anchor_method": "mean of published GNIS multipoints",
+        "position_status": "derived cartographic anchor"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [-114.652467, 44.063122] },
+      "properties": {
+        "id": "range:gnis:393323",
+        "name": "White Clouds",
+        "official_name": "White Cloud Peaks",
+        "local_alias": "The White Clouds",
+        "display_name": "White Clouds",
+        "label_tier": "local",
+        "context": "Central Idaho / Ketchum region",
+        "gnis_id": 393323,
+        "source": "USGS GNIS; USDA Forest Service; owner-confirmed local naming",
+        "source_url": "https://www.fs.usda.gov/Internet/FSE_DOCUMENTS/stelprdb5196581.pdf",
+        "anchor_method": "mean of published GNIS multipoints",
+        "position_status": "derived cartographic anchor"
+      }
+    }
+  ]
+}
