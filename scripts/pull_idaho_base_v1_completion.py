@@ -19,6 +19,7 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
+from derive_developed_camping import developed_camping_points
 from shapely import make_valid
 from shapely.geometry import (
     GeometryCollection,
@@ -28,7 +29,6 @@ from shapely.geometry import (
     mapping,
     shape,
 )
-from derive_developed_camping import developed_camping_points
 
 ROOT = Path(__file__).resolve().parent.parent
 BOUNDARY_PATH = ROOT / "data" / "boundaries" / "idaho_census_2025.geojson"
