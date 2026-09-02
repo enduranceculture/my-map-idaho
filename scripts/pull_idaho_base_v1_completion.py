@@ -28,6 +28,7 @@ from shapely.geometry import (
     mapping,
     shape,
 )
+from derive_developed_camping import developed_camping_points
 
 ROOT = Path(__file__).resolve().parent.parent
 BOUNDARY_PATH = ROOT / "data" / "boundaries" / "idaho_census_2025.geojson"
@@ -397,6 +398,7 @@ def pull_rich_recreation(boundary) -> None:
         if "TRAILHEAD"
         in str((feature.get("properties") or {}).get("site_type") or "").upper()
     ]
+    developed_camping = developed_camping_points(clipped)
     source_name = "USFS EDW Recreation Infrastructure Sites"
     note = (
         "Public-facing recreation infrastructure with activity/service lists, "
@@ -410,6 +412,20 @@ def pull_rich_recreation(boundary) -> None:
     write_geojson(
         ACCESS_DIR / "usfs_recreation_sites_rich_idaho_map.geojson",
         feature_collection("recreation-sites-rich-map", source_name, map_features, note),
+    )
+    write_geojson(
+        ACCESS_DIR / "usfs_developed_campgrounds_idaho.geojson",
+        feature_collection(
+            "developed-camping",
+            source_name,
+            developed_camping,
+            (
+                "Developed USFS camping facilities only: CAMPGROUND, GROUP CAMPGROUND, "
+                "and HORSE CAMP. Broad CAMPING AREA and individual CAMP UNIT records "
+                "are excluded to avoid ambiguous sites and duplicate map markers. "
+                "Operational status is source-published context, not a live guarantee."
+            ),
+        ),
     )
     if trailheads:
         write_geojson(

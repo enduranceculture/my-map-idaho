@@ -50,6 +50,23 @@ Current snapshot: **4,338 recreation infrastructure sites**, with a **488-featur
 
 This source adds the richer practical context that the simpler Recreation Opportunities feed does not consistently expose, including published activity/service lists, seasonal operational status, fees, open season, usage level, water/restroom availability, permits, restrictions, directions, elevations, capacity and official URLs when present.
 
+### Developed camping delivery layer
+
+Current snapshot: **451 developed camping facilities**.
+
+- `usfs_developed_campgrounds_idaho.geojson` — one lightweight, map-facing point
+  per USFS `CAMPGROUND`, `GROUP CAMPGROUND`, or `HORSE CAMP`.
+
+The derivative deliberately excludes the much broader `CAMPING AREA` type and
+individual `CAMP UNIT` records. Those source classes include subordinate,
+less-specific, or duplicative records that should not appear as separate
+statewide campground destinations.
+
+Published season and operational fields are retained as source context, not a
+guarantee that a facility is currently open, reachable, reservable, or free of
+temporary restrictions. Consuming apps should link to the official source and
+tell users to verify current conditions.
+
 ## Refresh
 
 - `.github/workflows/refresh-access-hydro-names.yml` rebuilds drive-access roads plus the Recreation Opportunities layer.

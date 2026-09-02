@@ -118,6 +118,22 @@
       "notes": "Browser file is simplified but still relatively large; a strong future vector-tile candidate."
     },
     {
+      "id": "developed-camping",
+      "label": "Developed Camping",
+      "group": "access",
+      "scope": "statewide",
+      "geometry": "point",
+      "feature_count": 451,
+      "source_class": "official",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/access/usfs_developed_campgrounds_idaho.geojson"
+        }
+      },
+      "notes": "Curated USFS CAMPGROUND, GROUP CAMPGROUND, and HORSE CAMP facilities. Broad CAMPING AREA and individual CAMP UNIT records are excluded to avoid ambiguous or duplicate destinations."
+    },
+    {
       "id": "recreation-sites",
       "label": "Recreation Sites",
       "group": "access",
