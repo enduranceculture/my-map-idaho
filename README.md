@@ -83,6 +83,16 @@ Current sharded logical layers:
 - `data/hydro/usgs_3dhp_named_flowlines_idaho_manifest.json` — **115,879** flowline features across **6** source-faithful shards.
 - `data/hydro/usgs_3dhp_named_flowlines_idaho_map_manifest.json` — the same **115,879** flowlines across **4** simplified map-facing shards.
 
+## Curated directional river pilot
+
+\`data/hydro/big_wood_river_flow_v1.geojson\` is a lightweight, one-feature map derivative for the Big Wood River:
+
+- It merges **549** connected USGS NHDPlus HR flowline segments on level path \`55001200002020\` into one **220.557 km** line.
+- Every source segment has \`FlowDir=WithDigitized\`; USGS defines its coordinate order from the upstream FromNode to the downstream ToNode.
+- The browser line therefore supports repeated arrow symbols that point downstream without guessing from the basemap.
+- The geometry is official-derived and display-generalized, not survey or navigation guidance. The source was retrieved September 2, 2026 from the [USGS NHDPlus HR NetworkNHDFlowline service](https://hydro.nationalmap.gov/arcgis/rest/services/NHDPlus_HR/MapServer/3).
+- \`scripts/build_curated_river_flow.py\` repeats this pipeline for another named river. If one name spans multiple level paths, pass the intended level-path ID explicitly rather than allowing an ambiguous merge.
+
 ## Current trail packs
 
 Trail coverage is intentionally independent from the statewide Base v1 context. Current USFS packs include:

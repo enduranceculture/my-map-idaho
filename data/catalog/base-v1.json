@@ -188,6 +188,22 @@
       "notes": "Load every shard listed by the selected manifest as one logical layer. Highest-priority vector-tile candidate for a polished statewide viewer."
     },
     {
+      "id": "big-wood-river-flow",
+      "label": "Big Wood River Flow",
+      "group": "hydro",
+      "scope": "big-wood-river-corridor",
+      "geometry": "line",
+      "feature_count": 1,
+      "source_class": "official-derived",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/hydro/big_wood_river_flow_v1.geojson"
+        }
+      },
+      "notes": "Lightweight directional pilot derived from 549 connected USGS NHDPlus HR flowline segments. Coordinates follow the official WithDigitized upstream-to-downstream order. The merged browser feature preserves source geometry while supporting repeatable downstream arrows."
+    },
+    {
       "id": "named-waterbodies",
       "label": "Named Lakes & Waterbodies",
       "group": "hydro",
