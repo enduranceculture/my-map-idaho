@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "reference_id": "idpr-recreation-ketchum-greenhorn-deercreek-v1",
+  "snapshot_date": "2026-09-05",
+  "purpose": "Dynamic, non-canonical reference overlays for comparing Idaho Department of Parks and Recreation recreation data with MY MAP's existing official USFS layers. Geometry is not copied into this repository.",
+  "scope": {
+    "label": "Ketchum · Greenhorn · Deer Creek",
+    "bbox_wgs84": [-114.75, 43.45, -114.1, 43.9]
+  },
+  "source": {
+    "publisher": "Idaho Department of Parks and Recreation",
+    "service_name": "Idaho Recreation Trails",
+    "item_id": "5a08280a853b41b69115a3fc0abbd2bc",
+    "service_url": "https://services1.arcgis.com/CNPdEkvnGl65jCX8/ArcGIS/rest/services/Idaho_Recreation_Trails/FeatureServer",
+    "metadata_url": "https://www.arcgis.com/sharing/rest/content/items/5a08280a853b41b69115a3fc0abbd2bc/info/metadata/metadata.xml?format=default&output=html",
+    "data_last_edit": "2026-08-21",
+    "attribution": "Idaho Parks and Recreation Department, United States Forest Service, Bureau of Land Management",
+    "use_constraints": "Not for commercial use and may not be used in third-party apps without source attribution. Organizations wishing to consume the Feature Service should inquire with IDPR for a use agreement and schema information.",
+    "contact": "maps@idpr.idaho.gov"
+  },
+  "integration_policy": {
+    "mode": "dynamic-reference-only",
+    "canonical": false,
+    "copy_geometry_to_repo": false,
+    "default_visibility": false,
+    "personal_places_enabled": false,
+    "notes": "Use these layers for local comparison, gap finding, POI context, and closure awareness. Do not replace canonical USFS geometry or infer bicycle legality from route symbology."
+  },
+  "layers": [
+    {
+      "id": "idpr-recreation-routes-local",
+      "label": "IDPR Recreation Routes — Local",
+      "group": "reference",
+      "scope": "regional",
+      "geometry": "line",
+      "source_class": "official-reference",
+      "source_attribution": "IDPR · USFS · BLM",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "https://services1.arcgis.com/CNPdEkvnGl65jCX8/ArcGIS/rest/services/Idaho_Recreation_Trails/FeatureServer/128/query?where=1%3D1&geometry=-114.75%2C43.45%2C-114.10%2C43.90&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=%2A&returnGeometry=true&outSR=4326&f=geojson"
+        }
+      }
+    },
+    {
+      "id": "idpr-recreation-poi-local",
+      "label": "IDPR Points of Interest — Local",
+      "group": "reference",
+      "scope": "regional",
+      "geometry": "point",
+      "source_class": "official-reference",
+      "source_attribution": "IDPR · USFS · BLM",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "https://services1.arcgis.com/CNPdEkvnGl65jCX8/ArcGIS/rest/services/Idaho_Recreation_Trails/FeatureServer/130/query?where=1%3D1&geometry=-114.75%2C43.45%2C-114.10%2C43.90&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=%2A&returnGeometry=true&outSR=4326&f=geojson"
+        }
+      }
+    },
+    {
+      "id": "idpr-emergency-closures-local",
+      "label": "IDPR Emergency Closures — Local",
+      "group": "reference",
+      "scope": "regional",
+      "geometry": "line",
+      "source_class": "official-reference",
+      "source_attribution": "IDPR · USFS · BLM",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "https://services1.arcgis.com/CNPdEkvnGl65jCX8/ArcGIS/rest/services/Idaho_Recreation_Trails/FeatureServer/127/query?where=1%3D1&geometry=-114.75%2C43.45%2C-114.10%2C43.90&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=%2A&returnGeometry=true&outSR=4326&f=geojson"
+        }
+      }
+    }
+  ]
+}
