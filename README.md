@@ -23,7 +23,7 @@ The visual basemap itself should still come from a mapping provider / map servic
 | Named hydrography | **Live statewide** | USGS 3D Hydrography Program (3DHP) | `data/hydro/` |
 | Named physical landforms | **Live statewide** | USGS GNIS / The National Map Gazetteer | `data/places/` |
 | Curated mountain-range labels | **Live / curated** | 19 official GNIS ranges with Idaho and immediate border context | `data/places/` |
-| Old-growth research points | **Live** | Researched onX waypoints accepted for this map | `data/old-growth/` |
+| Old-growth research points | **Live / Idaho + Oakridge** | Researched Idaho waypoints + source-backed Oakridge, Oregon research accepted for this map | `data/old-growth/` |
 | Mature / old-growth landscape inventory | **Live statewide** | USDA Forest Service Fireshed Mature and Old Growth Area | `data/old-growth/` |
 | Rockhounding | **Partial / live** | Researched onX point(s); thematic enrichment later | `data/rockhounding/` |
 | Ride history | **Deferred** | Strava / GPX activity history | future `data/ride-history/` |
@@ -50,7 +50,7 @@ Current authoritative / derived feature counts:
 | USGS 3DHP springs | 12,836 |
 | USGS GNIS physical landforms | 8,374 |
 | Curated mountain-range labels | 19 |
-| Researched old-growth / ancient-tree points | 15 |
+| Researched old-growth / ancient-tree / heritage points | 25 (15 Idaho + 10 Oakridge, Oregon) |
 | USDA Mature / Old-Growth Fireshed features | 188 |
 
 Counts reflect the 2026-09-01 snapshot and can change when authoritative upstream sources change.
@@ -106,8 +106,8 @@ Trail coverage is intentionally independent from the statewide Base v1 context. 
 
 `data/old-growth/` contains two complementary forms of intelligence:
 
-- researched waypoints for notable old-growth / ancient-tree locations and related context;
-- USDA Fireshed mature / old-growth landscape inventory polygons.
+- researched waypoints for notable old-growth / ancient-tree locations and related context, now including a source-backed Oakridge, Oregon research pack while preserving Idaho and Oakridge source files separately;
+- USDA Fireshed mature / old-growth landscape inventory polygons for Idaho.
 
 The USDA Fireshed polygons are landscape-scale inventory/context, not stand-level or individual-tree locations. Keep them visually and semantically separate from researched points.
 
@@ -142,7 +142,7 @@ map.addSource("recreation-sites", {
 
 map.addSource("old-growth-research", {
   type: "geojson",
-  data: "https://raw.githubusercontent.com/enduranceculture/my-map-idaho/main/data/old-growth/old_growth_research_points_idaho.geojson",
+  data: "https://raw.githubusercontent.com/enduranceculture/my-map-idaho/main/data/old-growth/old_growth_research_points_mydaho.geojson",
 });
 ```
 
