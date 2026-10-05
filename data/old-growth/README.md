@@ -7,9 +7,15 @@ This layer is intentionally separate from the general `trees/` layer. It combine
 
 ## Live personal research
 
-`old_growth_research_points_idaho.geojson` contains 15 Idaho waypoints researched by Nick and exported from onX Backcountry on 2026-08-31.
+The source research is kept geographically explicit while the app consumes one combined logical layer:
 
-For this personal map, these points are accepted as authoritative user research. That does **not** mean every marker is a surveyed individual tree or a formally mapped old-growth polygon. Source-level precision caveats remain attached to each feature.
+- `old_growth_research_points_idaho.geojson` — 15 Idaho waypoints researched by Nick and exported from onX Backcountry on 2026-08-31.
+- `old_growth_research_points_oakridge.geojson` — 10 Oakridge, Oregon old-growth / giant-tree / heritage-landscape research points compiled 2026-10-05.
+- `old_growth_research_points_mydaho.geojson` — combined browser delivery for the existing logical `old-growth-research` layer (25 features total).
+
+The Oakridge research preserves representative-coordinate uncertainty, dated access/closure notes, source URLs, and the deliberate broad-only treatment of Jim's Creek culturally modified trees.
+
+For this personal map, these points are accepted as authoritative user research. That does **not** mean every marker is a surveyed individual tree or a formally mapped old-growth polygon. Source-level precision caveats remain attached to each feature. Temporary access/closure statements are dated facts rather than permanent status.
 
 Useful fields:
 

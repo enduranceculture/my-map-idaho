@@ -1,0 +1,353 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "layer": "old-growth-research",
+    "scope": "Oakridge, Oregon (~30-mile research radius)",
+    "feature_count": 10,
+    "source": "Nick Hegyesi Oakridge old-growth deep research",
+    "research_date": "2026-10-05",
+    "reference_center": [
+      -122.4617,
+      43.7465
+    ],
+    "accuracy_policy": "Representative/estimated coordinates are research and navigation seeds, not exact tree coordinates. Coordinate caveats remain explicit per feature.",
+    "cultural_site_policy": "Jim's Creek intentionally uses a broad landscape pin; do not infer or publish individual culturally modified tree coordinates.",
+    "temporary_status_policy": "Closure/access statements are dated observations as of 2026-10-05 and must not be interpreted as permanent status."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.45885,
+          43.7391
+        ]
+      },
+      "properties": {
+        "id": "nick-research-old-growth:greenwaters-trail",
+        "name": "Greenwaters Trail Old Growth",
+        "old_growth_relevance": "old-growth",
+        "strict_old_growth": true,
+        "subtype": "old-growth forest",
+        "species": "Douglas-fir",
+        "confidence": "Verified",
+        "evidence_confidence": "High",
+        "coordinate_confidence": "High",
+        "coordinate_type": "park/trail access / representative old-growth location",
+        "coordinate_uncertainty_miles": 0.15,
+        "position_status": "source-note-caveat",
+        "access": "Public Greenwaters trail/park access.",
+        "summary": "Accessible old-growth Douglas-fir forest along the Middle Fork Willamette on the edge of Oakridge. The pin represents the trail/park old-growth area rather than an individual tree.",
+        "source": "US Forest Service — Greenwaters Trail #4250",
+        "source_url": "https://www.fs.usda.gov/r06/willamette/recreation/trails/greenwaters-trail-4250",
+        "source_quality": "official-primary",
+        "research_date": "2026-10-05",
+        "land_manager": "US Forest Service / Willamette National Forest",
+        "practical_rank": 5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.373056,
+          43.762778
+        ]
+      },
+      "properties": {
+        "id": "nick-research-old-growth:salmon-creek-falls",
+        "name": "Salmon Creek Falls Old-Growth Forest",
+        "old_growth_relevance": "old-growth",
+        "strict_old_growth": true,
+        "subtype": "old-growth forest",
+        "confidence": "Verified",
+        "evidence_confidence": "Very High",
+        "coordinate_confidence": "Very High",
+        "coordinate_type": "official USFS facility/location point representing surrounding old-growth forest",
+        "coordinate_uncertainty_miles": 0.05,
+        "position_status": "source-note-caveat",
+        "access": "Public Salmon Creek area. Developed campground/day-use facilities were closed for the 2026 season; verify current USFS conditions before visiting.",
+        "summary": "Lush old-growth forest along Salmon Creek with pools and small falls. This is the same location as the prior approximate research pin near 43.76206, -122.37522; the official USFS point is used here.",
+        "source": "US Forest Service — Salmon Creek Falls Campground and Day Use",
+        "source_url": "https://www.fs.usda.gov/r06/willamette/recreation/salmon-creek-falls-campground-and-day-use",
+        "source_quality": "official-primary",
+        "research_date": "2026-10-05",
+        "temporary_access_status": "Developed campground/day-use site closed for 2026 season; reopening anticipated spring 2027.",
+        "temporary_access_status_date": "2026-10-05",
+        "land_manager": "US Forest Service / Willamette National Forest"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.455,
+          43.698
+        ]
+      },
+      "properties": {
+        "id": "nick-research-old-growth:larison-rock-lower",
+        "name": "Larison Rock Lower Old Growth",
+        "old_growth_relevance": "old-growth",
+        "strict_old_growth": true,
+        "subtype": "lower-trail old-growth forest",
+        "species": "Douglas-fir; western hemlock",
+        "confidence": "Verified",
+        "evidence_confidence": "High",
+        "coordinate_confidence": "Medium",
+        "coordinate_type": "representative lower-trail old-growth pin; not an exact tree/grove coordinate",
+        "coordinate_uncertainty_miles": 1,
+        "position_status": "source-note-caveat",
+        "access": "Larison Rock Trail #3607. Hiking, horses and mountain biking are supported uses; research noted seasonal MTB restrictions Nov–Mar.",
+        "summary": "Lower Larison Rock Trail passes through substantial old-growth Douglas-fir and western hemlock forest. The pin represents the lower old-growth portion of the trail, not the summit or a single tree.",
+        "source": "US Forest Service — Larison Rock Trail #3607",
+        "source_url": "https://www.fs.usda.gov/r06/willamette/recreation/trails/larison-rock-trail-3607",
+        "secondary_source_url": "https://www.fs.usda.gov/r06/willamette/recreation/larison-rock-trailhead",
+        "source_quality": "official-primary",
+        "research_date": "2026-10-05",
+        "land_manager": "US Forest Service / Willamette National Forest",
+        "practical_rank": 2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.44,
+          43.688056
+        ]
+      },
+      "properties": {
+        "id": "nick-research-old-growth:larison-creek-corridor",
+        "name": "Larison Creek Old-Growth Corridor",
+        "old_growth_relevance": "old-growth",
+        "strict_old_growth": true,
+        "subtype": "old-growth corridor",
+        "species": "Douglas-fir; western hemlock; western redcedar; incense cedar",
+        "confidence": "Verified",
+        "evidence_confidence": "Very High",
+        "coordinate_confidence": "Very High for lower access; corridor extends beyond pin",
+        "coordinate_type": "lower trailhead/access point for a linear old-growth corridor",
+        "position_status": "source-note-caveat",
+        "access": "Lower trailhead shown. Significant mature forest continues roughly 6.3 miles toward the upper trailhead at approximately 43.6845, -122.5291.",
+        "summary": "A 6.3-mile old-growth corridor containing Douglas-fir, western hemlock, western redcedar and incense cedar. This point marks lower access; it does not represent one isolated grove.",
+        "source": "US Forest Service — Larison Creek Trail #3646",
+        "source_url": "https://www.fs.usda.gov/r06/willamette/recreation/trails/larison-creek-trail-3646",
+        "secondary_source_url": "https://www.fs.usda.gov/r06/willamette/recreation/larison-creek-trailhead-lower",
+        "tertiary_source_url": "https://www.fs.usda.gov/r06/willamette/recreation/larison-creek-trailhead-upper",
+        "source_quality": "official-primary",
+        "research_date": "2026-10-05",
+        "land_manager": "US Forest Service / Willamette National Forest",
+        "practical_rank": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.41,
+          43.505
+        ]
+      },
+      "properties": {
+        "id": "nick-research-old-growth:jims-creek-heritage-landscape",
+        "name": "Jim's Creek Heritage Pine–Oak Landscape",
+        "old_growth_relevance": "heritage-tree-landscape",
+        "strict_old_growth": false,
+        "subtype": "heritage landscape / cultural fire landscape",
+        "species": "Ponderosa pine; Oregon white oak",
+        "confidence": "Verified",
+        "evidence_confidence": "High",
+        "coordinate_confidence": "Medium",
+        "coordinate_type": "broad project-area center; intentionally not an individual culturally modified tree",
+        "coordinate_uncertainty_miles": 1.5,
+        "position_status": "source-note-caveat",
+        "access": "Broad project-area location only. Do not use this pin to seek individual culturally modified trees.",
+        "summary": "Restored Oregon white oak–ponderosa pine cultural landscape with large heritage ponderosa pines. Some trees show evidence of traditional Indigenous bark harvesting; the pin intentionally represents the broader landscape, not individual culturally modified trees.",
+        "source": "US Forest Service — Jim's Creek project",
+        "source_url": "https://www.fs.usda.gov/r06/willamette/projects/3922",
+        "secondary_source_url": "https://swap.oregon.gov/success-story/jims-creek-restoration/",
+        "source_quality": "official-primary",
+        "research_date": "2026-10-05",
+        "sensitive_location_policy": "Do not publish, infer, or geocode individual culturally modified / medicine-tree locations.",
+        "land_manager": "US Forest Service / Willamette National Forest",
+        "significance_rank": 6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.42,
+          43.97
+        ]
+      },
+      "properties": {
+        "id": "nick-research-old-growth:tall-trees-grove-4269",
+        "name": "Tall Trees Grove / Trail #4269",
+        "old_growth_relevance": "old-growth",
+        "strict_old_growth": true,
+        "subtype": "giant trees / old-growth grove",
+        "species": "Douglas-fir",
+        "age": "Not specified; exceptional old-growth stand",
+        "confidence": "Verified",
+        "evidence_confidence": "Very High",
+        "coordinate_confidence": "Medium",
+        "coordinate_type": "estimated grove/trail area from USFS access directions",
+        "coordinate_uncertainty_miles": 2,
+        "position_status": "source-note-caveat",
+        "access": "Use official USFS access information. Research road sequence: FR18 → FR1817 → FR1806 → FR427.",
+        "summary": "Exceptional roughly 50-acre tall-tree forest with Douglas-firs about 270–310 feet tall, including specimens exceeding 300 feet. Pin is representative; navigate using official USFS access information.",
+        "notable_dimensions": "Douglas-fir approximately 270–310 ft tall; specimens exceeding 300 ft",
+        "source": "US Forest Service — Tall Trees Trail #4269",
+        "source_url": "https://www.fs.usda.gov/r06/willamette/recreation/trails/tall-trees-trail-4269",
+        "secondary_source_url": "https://www.fs.usda.gov/r06/willamette/recreation/tall-trees-trailhead",
+        "source_quality": "official-primary",
+        "research_date": "2026-10-05",
+        "land_manager": "US Forest Service / Willamette National Forest",
+        "significance_rank": 2,
+        "practical_rank": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.32,
+          43.98
+        ]
+      },
+      "properties": {
+        "id": "nick-research-old-growth:constitution-grove",
+        "name": "Constitution Grove",
+        "old_growth_relevance": "old-growth",
+        "strict_old_growth": true,
+        "subtype": "old-growth grove",
+        "species": "Douglas-fir; western hemlock; western redcedar",
+        "confidence": "Verified",
+        "evidence_confidence": "High",
+        "coordinate_confidence": "Medium",
+        "coordinate_type": "estimated grove/access area from USFS directions",
+        "coordinate_uncertainty_miles": 2,
+        "position_status": "source-note-caveat",
+        "access": "Short interpretive loop; forest-road travel is considerably longer than straight-line distance suggests.",
+        "summary": "Classic old-growth Douglas-fir grove on an elevated river bench with western hemlock and western redcedar. USFS notes that many trees were already alive when the U.S. Constitution was signed.",
+        "source": "US Forest Service — Constitution Grove Trail #3675",
+        "source_url": "https://www.fs.usda.gov/r06/willamette/recreation/trails/constitution-grove-trail-3675",
+        "secondary_source_url": "https://www.oregonhikers.org/field_guide/Constitution_Grove_Loop_Hike",
+        "source_quality": "official-primary",
+        "research_date": "2026-10-05",
+        "land_manager": "US Forest Service / Willamette National Forest",
+        "significance_rank": 5,
+        "practical_rank": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.098,
+          43.704
+        ]
+      },
+      "properties": {
+        "id": "nick-research-old-growth:joe-goddards-grove",
+        "name": "Joe Goddards Grove",
+        "old_growth_relevance": "ancient-tree-site",
+        "strict_old_growth": true,
+        "subtype": "ancient grove / giant trees",
+        "species": "Douglas-fir; western redcedar; western hemlock; Pacific yew",
+        "age": "Approximately 450–700 years",
+        "confidence": "Verified",
+        "evidence_confidence": "Very High",
+        "coordinate_confidence": "Representative",
+        "coordinate_type": "estimated grove area from USFS legal description and road information",
+        "coordinate_uncertainty_miles": 1,
+        "position_status": "source-note-caveat",
+        "access": "Primary trailhead was closed for post–Cedar Creek Fire impacts and hazards as of 2026-10-05. Verify current USFS conditions before travel.",
+        "summary": "Exceptional ancient grove containing Douglas-fir, western redcedar, western hemlock and giant Pacific yews. USFS documents trees roughly 450–700 years old and up to 116+ inches in diameter. Representative pin only.",
+        "notable_dimensions": "Old-growth trees approximately 40–116+ inches in diameter; historically measured tree approximately 251 ft tall",
+        "source": "US Forest Service — Joe Goddards Grove Trail #3690",
+        "source_url": "https://www.fs.usda.gov/r06/willamette/recreation/trails/joe-goddards-grove-trail-3690",
+        "source_quality": "official-primary",
+        "research_date": "2026-10-05",
+        "temporary_access_status": "Primary access closed for Cedar Creek Fire impacts/hazards as of research date; verify current conditions.",
+        "temporary_access_status_date": "2026-10-05",
+        "land_manager": "US Forest Service / Willamette National Forest",
+        "significance_rank": 1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.07225,
+          43.66315
+        ]
+      },
+      "properties": {
+        "id": "nick-research-old-growth:south-waldo-mountain-hemlock",
+        "name": "South Waldo Mountain-Hemlock Old Growth",
+        "old_growth_relevance": "old-growth",
+        "strict_old_growth": true,
+        "subtype": "high-elevation old-growth forest",
+        "species": "Mountain hemlock; spruce",
+        "confidence": "Partial",
+        "evidence_confidence": "Medium-High",
+        "coordinate_confidence": "Medium-High",
+        "coordinate_type": "representative South Waldo trail/forest point",
+        "coordinate_uncertainty_miles": 0.5,
+        "position_status": "source-note-caveat",
+        "access": "Access may be affected by Cedar Creek Fire closures depending on approach. Verify current conditions; no permanent open/closed state is asserted.",
+        "summary": "High-elevation mountain-hemlock old growth south of Waldo Lake, with old spruce and mature subalpine forest. A distinct ecosystem from Oakridge's lower-elevation Douglas-fir and cedar forests.",
+        "source": "Oregon Wild",
+        "source_url": "https://oregonwild.org/hiking-in-old-growth-forests-seeing-the-forest-and-the-trees/",
+        "secondary_source_url": "https://oldgrowthhikespnw.org/middle-fork-west/59-south-waldo",
+        "source_quality": "secondary-research",
+        "research_date": "2026-10-05",
+        "significance_rank": 4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.0566,
+          43.8443
+        ]
+      },
+      "properties": {
+        "id": "nick-research-old-growth:shale-ridge-cedar-grove",
+        "name": "Shale Ridge Cedar Grove",
+        "old_growth_relevance": "old-growth",
+        "strict_old_growth": true,
+        "subtype": "giant cedar grove",
+        "species": "Western redcedar",
+        "confidence": "Partial",
+        "evidence_confidence": "Medium-High",
+        "coordinate_confidence": "Medium-High",
+        "coordinate_type": "mapped grove",
+        "coordinate_uncertainty_miles": 0.1,
+        "position_status": "user-accepted",
+        "access": "Remote bottomland grove; verify current access conditions before visiting.",
+        "summary": "Remote bottomland grove of enormous western redcedars along braided North Fork Middle Fork Willamette channels. Some cedars are reported around eight feet in diameter.",
+        "notable_dimensions": "Western redcedars reported around 8 ft diameter",
+        "source": "Trailkeepers of Oregon / Oregon Hikers — Shale Ridge Cedar Grove",
+        "source_url": "https://www.oregonhikers.org/field_guide/Shale_Ridge_Cedar_Grove",
+        "source_quality": "community-primary-for-location; no dedicated current USFS inventory page identified in research",
+        "research_date": "2026-10-05",
+        "significance_rank": 3
+      }
+    }
+  ]
+}
