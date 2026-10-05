@@ -272,16 +272,17 @@
       "id": "old-growth-research",
       "label": "Old Growth Research",
       "group": "old-growth",
-      "scope": "idaho-research",
+      "scope": "idaho-oakridge-research",
       "geometry": "point",
-      "feature_count": 15,
+      "feature_count": 25,
       "source_class": "user-researched",
       "delivery": {
         "browser": {
           "type": "geojson",
-          "path": "data/old-growth/old_growth_research_points_idaho.geojson"
+          "path": "data/old-growth/old_growth_research_points_mydaho.geojson"
         }
-      }
+      },
+      "notes": "Combined browser delivery for MYDAHO research: 15 Idaho points + 10 Oakridge, Oregon points. Source-specific coordinate caveats and dated access conditions remain attached per feature."
     },
     {
       "id": "mature-old-growth-landscapes",
