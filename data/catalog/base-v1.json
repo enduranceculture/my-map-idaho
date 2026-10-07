@@ -405,6 +405,23 @@
         }
       },
       "notes": "Official developed USFS campgrounds for the Oakridge / Westfir field area."
+    },
+    {
+      "id": "hot-springs-oakridge-oregon",
+      "label": "Hot Springs — Oakridge / Westfir, Oregon",
+      "group": "hot-springs",
+      "scope": "oakridge-westfir-oregon",
+      "geometry": "point",
+      "feature_count": 3,
+      "source_class": "curated-source-backed",
+      "source_attribution": "USFS/Recreation.gov + source-backed local access research",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/hot-springs/oakridge_hot_springs.geojson"
+        }
+      },
+      "notes": "Shared canonical Hogaboot hot-springs geography. Personal Hit/Yet remains account-scoped. Access status is dated context, not a live guarantee."
     }
   ]
 }

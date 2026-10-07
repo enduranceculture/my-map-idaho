@@ -1,0 +1,98 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "dataset_id": "hot-springs-oakridge-oregon",
+    "scope": "Oakridge / Westfir, Oregon",
+    "maintained_by": "MYDAHO / Endurance Culture",
+    "updated_at": "2026-10-07",
+    "update_policy": "Shared canonical geography. New verified springs or better source facts improve the map for every user; personal Hit/Yet state remains account-scoped in MYDAHO.",
+    "coverage_note": "V1 includes known documented thermal spring sites in the immediate Oakridge / Westfir field area. Access status can change and is not a live guarantee."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "mccredie-hot-springs",
+        "name": "McCredie Hot Springs",
+        "kind": "hot-spring",
+        "access_status": "public-day-use",
+        "soak_status": "available-with-caution",
+        "land_manager": "Willamette National Forest",
+        "source_type": "federal-recreation-listing",
+        "source_url": "https://www.recreation.gov/camping/campgrounds/10165170",
+        "secondary_source_url": "https://traveloregon.com/things-to-do/destinations/parks-forests-wildlife-areas/mccredie-day-use-area-hot-springs/",
+        "last_verified": "2026-10-07",
+        "access_note": "Day-use hot springs east of Oakridge. Pools can be extremely hot; conditions and access should be checked before entering.",
+        "tags": [
+          "hot-spring",
+          "soak",
+          "day-use",
+          "oakridge"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.288,
+          43.708
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "wall-creek-warm-springs",
+        "name": "Wall Creek Warm Springs (Meditation Pool)",
+        "kind": "hot-spring",
+        "access_status": "verify-current-closure",
+        "soak_status": "access-uncertain",
+        "land_manager": "Willamette National Forest",
+        "source_type": "source-backed-research",
+        "source_url": "https://soakdates.com/oregon/wall-creek-warm-springs/",
+        "last_verified": "2026-10-07",
+        "access_note": "Primary Warm Springs Trailhead access has been reported closed due to Cedar Creek closure impacts. Verify current Forest Service access before visiting.",
+        "tags": [
+          "warm-spring",
+          "soak",
+          "oakridge",
+          "verify-access"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.309,
+          43.808
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "kitson-hot-springs",
+        "name": "Kitson Hot Springs",
+        "kind": "hot-spring",
+        "access_status": "private-not-open",
+        "soak_status": "not-public",
+        "land_manager": "Private property",
+        "source_type": "owner-community-source",
+        "source_url": "https://www.friendsofkitsonsprings.org/",
+        "last_verified": "2026-10-07",
+        "access_note": "Private property and not open for general public access as of 2026-10-07. Included to make the shared map truthful and prevent it from being mistaken for a public soak.",
+        "tags": [
+          "hot-spring",
+          "oakridge",
+          "private",
+          "future-access"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.372,
+          43.689
+        ]
+      }
+    }
+  ]
+}
