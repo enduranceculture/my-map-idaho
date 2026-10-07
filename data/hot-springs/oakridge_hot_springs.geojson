@@ -6,7 +6,8 @@
     "maintained_by": "MYDAHO / Endurance Culture",
     "updated_at": "2026-10-07",
     "update_policy": "Shared canonical geography. New verified springs or better source facts improve the map for every user; personal Hit/Yet state remains account-scoped in MYDAHO.",
-    "coverage_note": "V1 includes known documented thermal spring sites in the immediate Oakridge / Westfir field area. Access status can change and is not a live guarantee."
+    "coverage_note": "V1 includes known documented thermal spring sites in the immediate Oakridge / Westfir field area. Access status can change and is not a live guarantee.",
+    "coordinate_note": "V1 point coordinates were cross-checked against published spring-location sources; future better source truth may refine geometry without changing stable feature IDs."
   },
   "features": [
     {
@@ -28,13 +29,15 @@
           "soak",
           "day-use",
           "oakridge"
-        ]
+        ],
+        "coordinate_source": "GNIS-derived listing via TopoQuest",
+        "coordinate_source_url": "https://topoquest.com/place/oregon/spring/mccredie-hot-springs/1130581"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -122.288,
-          43.708
+          -122.287309,
+          43.705816
         ]
       }
     },
@@ -56,13 +59,15 @@
           "soak",
           "oakridge",
           "verify-access"
-        ]
+        ],
+        "coordinate_source": "Oregon Discovery published GPS",
+        "coordinate_source_url": "https://oregondiscovery.com/wall-creek-warm-springs"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -122.309,
-          43.808
+          -122.3111,
+          43.8071
         ]
       }
     },
@@ -84,13 +89,15 @@
           "oakridge",
           "private",
           "future-access"
-        ]
+        ],
+        "coordinate_source": "GeoNames/OpenStreetMap-derived listing via Mapcarta",
+        "coordinate_source_url": "https://mapcarta.com/23816070"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -122.372,
-          43.689
+          -122.37282,
+          43.68873
         ]
       }
     }
