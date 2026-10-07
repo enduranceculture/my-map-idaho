@@ -18,6 +18,9 @@ BASE = "https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_TrailNFSPublish_01/M
 # Each region emits raw, bike-confirmed, and lightweight app-facing GeoJSON layers.
 REGIONS = {
     "woodriver_sawtooth": "-115.2,43.3,-114.0,44.3",
+    # Oakridge / Westfir, Oregon field area. Official NFS trails are shared geography;
+    # rider Hit/Yet/history remains account-scoped in the MYDAHO app.
+    "oakridge_oregon": "-122.75,43.35,-121.65,44.25",
     # Tight context window around Sammy's Warm Springs TH -> Bonneville Hot Springs ride.
     # This is the authoritative geographic context source for Sammy's Trail Art.
     # Kept deliberately small so poster apps can pull accurate nearby trail context
