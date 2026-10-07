@@ -9,6 +9,7 @@ on:
       - main
     paths:
       - "scripts/pull_usfs_trails.py"
+      - "scripts/pull_oakridge_access.py"
 
 permissions:
   contents: write
@@ -21,8 +22,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Pull latest USFS data
+      - name: Pull latest USFS trail data
         run: python scripts/pull_usfs_trails.py
+      - name: Pull Oakridge access data
+        run: python scripts/pull_oakridge_access.py
       - name: Commit if changed
         run: |
           git config user.name "map-data-bot"
