@@ -1,0 +1,55 @@
+name: MYDAHO trail elevation profiles v1
+
+on:
+  push:
+    branches:
+      - feat/trail-elevation-profiles-v1
+    paths:
+      - scripts/build_elevation_profiles.py
+      - .github/workflows/trail-elevation-profiles.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-profiles:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install raster decoder
+        run: python -m pip install Pillow==11.3.0
+      - name: Verify algorithm without network
+        run: python scripts/build_elevation_profiles.py --smoke-test
+      - name: Generate shared terrain-derived profiles
+        run: python scripts/build_elevation_profiles.py --out data/elevation/trail_profiles_v1.json
+      - name: Validate generated coverage
+        run: |
+          python - <<'PY'
+          import json
+          p = json.load(open('data/elevation/trail_profiles_v1.json'))
+          assert p['schemaVersion'] == 1
+          required = ['trails-oakridge-oregon','trails-woodriver-sawtooth','trails-warm-springs-bonneville']
+          assert all(len(p['layers'][layer]) > 0 for layer in required), 'missing regional profiles'
+          for profiles in p['layers'].values():
+              for key, profile in profiles.items():
+                  assert profile['distanceM'] >= 20 and len(profile['samples']) >= 2, key
+                  assert 0 < profile['sourceCoverage'] <= 1.015, key
+          print({layer: len(p['layers'][layer]) for layer in required})
+          PY
+      - name: Commit generated cloud dataset to this branch
+        if: github.ref == 'refs/heads/feat/trail-elevation-profiles-v1'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/elevation/trail_profiles_v1.json
+          if ! git diff --staged --quiet; then
+            git commit -m "data: precompute shared Oakridge and Ketchum trail elevation profiles"
+            git push origin HEAD:feat/trail-elevation-profiles-v1
+          fi
