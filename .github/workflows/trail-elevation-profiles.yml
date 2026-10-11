@@ -28,27 +28,37 @@ jobs:
       - name: Verify algorithm without network
         run: python scripts/build_elevation_profiles.py --smoke-test
       - name: Generate shared terrain-derived profiles
-        run: python scripts/build_elevation_profiles.py --out data/elevation/trail_profiles_v1.json
+        run: python scripts/build_elevation_profiles.py --out data/elevation
       - name: Validate generated coverage
         run: |
           python - <<'PY'
           import json
-          p = json.load(open('data/elevation/trail_profiles_v1.json'))
-          assert p['schemaVersion'] == 1
+          from pathlib import Path
+          root = Path('data/elevation')
+          index = json.loads((root / 'index_v1.json').read_text())
+          assert index['schemaVersion'] == 1
           required = ['trails-oakridge-oregon','trails-woodriver-sawtooth','trails-warm-springs-bonneville']
-          assert all(len(p['layers'][layer]) > 0 for layer in required), 'missing regional profiles'
-          for profiles in p['layers'].values():
-              for key, profile in profiles.items():
-                  assert profile['distanceM'] >= 20 and len(profile['samples']) >= 2, key
-                  assert 0 < profile['sourceCoverage'] <= 1.015, key
-          print({layer: len(p['layers'][layer]) for layer in required})
+          for layer in required:
+              all_profiles = {}
+              for file in sorted((root / 'shards' / layer).glob('*.json')):
+                  data = json.loads(file.read_text())
+                  assert data['layerId'] == layer
+                  for key, profile in data['profiles'].items():
+                      assert key.endswith(file.stem), key
+                      assert profile['distanceM'] >= 20 and len(profile['samples']) >= 2, key
+                      assert 0 < profile['sourceCoverage'] <= 1.015, key
+                      assert key not in all_profiles, key
+                      all_profiles[key] = profile
+              assert len(all_profiles) == index['counts'][layer] > 0, layer
+          assert not (root / 'trail_profiles_v1.json').exists()
+          print(index['counts'])
           PY
       - name: Commit generated cloud dataset to this branch
         if: github.ref == 'refs/heads/feat/trail-elevation-profiles-v1'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/elevation/trail_profiles_v1.json
+          git add -A data/elevation
           if ! git diff --staged --quiet; then
             git commit -m "data: precompute shared Oakridge and Ketchum trail elevation profiles"
             git push origin HEAD:feat/trail-elevation-profiles-v1

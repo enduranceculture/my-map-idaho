@@ -331,9 +331,49 @@ def smoke_test() -> None:
     print("Elevation preprocessing smoke tests passed", flush=True)
 
 
+def write_shards(payload: dict, out_dir: Path) -> None:
+    """Publish tiny, deterministic cloud files keyed by the final base36 hash digit."""
+    alphabet = "0123456789abcdefghijklmnopqrstuvwxyz"
+    counts = {}
+    for layer, profiles in payload["layers"].items():
+        counts[layer] = len(profiles)
+        folder = out_dir / "shards" / layer
+        folder.mkdir(parents=True, exist_ok=True)
+        for digit in alphabet:
+            shard = {key: profile for key, profile in profiles.items() if key.endswith(digit)}
+            data = {
+                "schemaVersion": 1,
+                "generatedAt": payload["generatedAt"],
+                "terrainSource": payload["terrainSource"],
+                "verticalUnits": "meters",
+                "layerId": layer,
+                "profiles": shard,
+            }
+            (folder / f"{digit}.json").write_text(
+                json.dumps(data, separators=(",", ":"), ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+    manifest = {
+        "schemaVersion": 1,
+        "generatedAt": payload["generatedAt"],
+        "terrainSource": payload["terrainSource"],
+        "tileZoom": payload["tileZoom"],
+        "sampleStepM": payload["sampleStepM"],
+        "sharding": "final-personalKey-character",
+        "counts": counts,
+    }
+    (out_dir / "index_v1.json").write_text(
+        json.dumps(manifest, indent=2) + "\n", encoding="utf-8",
+    )
+    previous_monolith = out_dir / "trail_profiles_v1.json"
+    if previous_monolith.exists():
+        previous_monolith.unlink()
+    print(f"Cloud sharded profiles: {counts}; 108 files, one tiny request per trail", flush=True)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--out", default="data/elevation/trail_profiles_v1.json")
+    parser.add_argument("--out", default="data/elevation")
     parser.add_argument("--tile-zoom", type=int, default=13)
     parser.add_argument("--step-m", type=float, default=45.0)
     parser.add_argument("--max-chart-points", type=int, default=161)
@@ -347,12 +387,10 @@ def main() -> None:
     if not (20 <= opts.step_m <= 150):
         raise ValueError("Invalid sample interval")
     path = ROOT / opts.out
-    path.parent.mkdir(parents=True, exist_ok=True)
+    path.mkdir(parents=True, exist_ok=True)
     profile = generate({key: ROOT / rel for key, rel in LAYERS.items()},
                        opts.tile_zoom, opts.step_m, opts.max_chart_points)
-    path.write_text(json.dumps(profile, separators=(",", ":"), ensure_ascii=False) + "\n",
-                    encoding="utf-8")
-    print(f"Wrote {path} ({path.stat().st_size:,} bytes)", flush=True)
+    write_shards(profile, path)
 
 
 if __name__ == "__main__":
