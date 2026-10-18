@@ -25,7 +25,7 @@ import json
 import time
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from shapely.geometry import GeometryCollection, MultiPolygon, Polygon, mapping, shape
@@ -320,7 +320,7 @@ def feature_collection(features: list[dict], source: dict) -> dict:
             "scope": "Idaho",
             "source": source["name"],
             "source_url": source["url"],
-            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
             "feature_count": len(features),
             "clip_boundary": IDAHO_BOUNDARY_SOURCE,
             "method": "authoritative ArcGIS source, then exact local clip to Idaho",
@@ -401,3 +401,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
