@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -43,7 +43,7 @@ def yes_no(value):
 def source_date(value):
     if not isinstance(value, (int, float)):
         return None
-    return datetime.fromtimestamp(value / 1000, tz=timezone.utc).date().isoformat()
+    return datetime.fromtimestamp(value / 1000, tz=UTC).date().isoformat()
 
 
 def developed_camping_points(features: list[dict]) -> list[dict]:
@@ -137,3 +137,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

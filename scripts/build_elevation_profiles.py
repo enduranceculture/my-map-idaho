@@ -8,17 +8,18 @@ not measured trail grades or guaranteed ride direction.
 from __future__ import annotations
 
 import argparse
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
 import io
 import json
 import math
-from pathlib import Path
 import statistics
 import struct
 import time
 import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import UTC, datetime
+from itertools import pairwise
+from pathlib import Path
 
 from PIL import Image
 
@@ -79,7 +80,7 @@ def distance_m(a: list[float], b: list[float]) -> float:
 
 
 def line_distance(line: list) -> float:
-    return sum(distance_m(a, b) for a, b in zip(line, line[1:]))
+    return sum(distance_m(a, b) for a, b in pairwise(line))
 
 
 def lines_from_geometry(geom: dict) -> list[list[list[float]]]:
@@ -133,7 +134,7 @@ def stitch_components(lines: list[list]) -> list[list]:
 
 def sample_line(line: list, step_m: float) -> list[tuple[float, float, float]]:
     """Distance-interpolate; preserve endpoints and never connect separate components."""
-    lengths = [distance_m(a, b) for a, b in zip(line, line[1:])]
+    lengths = [distance_m(a, b) for a, b in pairwise(line)]
     total = sum(lengths)
     if total < 20:
         return []
@@ -161,7 +162,7 @@ def tile_position(lng: float, lat: float, zoom: int) -> tuple[int, int, float, f
     lat = max(-85.051, min(85.051, lat))
     fx = (lng + 180) / 360 * n
     fy = (1 - math.asinh(math.tan(math.radians(lat))) / math.pi) / 2 * n
-    x, y = int(math.floor(fx)), int(math.floor(fy))
+    x, y = math.floor(fx), math.floor(fy)
     return x, y, (fx - x) * 256, (fy - y) * 256
 
 
@@ -309,7 +310,7 @@ def generate(layers: dict[str, Path], zoom: int, step_m: float, max_chart_points
     print(f"Produced {sum(map(len, result.values()))} profiles, skipped {skipped} with missing/invalid DEM", flush=True)
     return {
         "schemaVersion": 1,
-        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "generatedAt": datetime.now(UTC).isoformat(),
         "terrainSource": "Mapzen/AWS Terrarium elevation tiles, derived from USGS elevation",
         "tileZoom": zoom,
         "sampleStepM": step_m,
@@ -395,3 +396,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

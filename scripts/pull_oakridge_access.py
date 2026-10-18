@@ -1,5 +1,12 @@
 """Pull Oakridge / Westfir USFS recreation access points."""
-import json, os, time, urllib.parse, urllib.request
+
+import json
+import os
+import time
+import urllib.parse
+import urllib.request
+from http.client import HTTPException
+
 BASE="https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_RecInfraRecreationSites_02/MapServer/0/query"
 BBOX="-122.75,43.35,-121.65,44.25"
 OUT_DIR=os.path.join(os.path.dirname(__file__),"..","data","access")
@@ -21,7 +28,7 @@ def req(params):
                 payload=json.loads(response.read().decode("utf-8"))
             if not payload.get("error"): return payload
             last=payload["error"]
-        except Exception as exc: last=exc
+        except (OSError, ValueError, HTTPException) as exc: last=exc
         time.sleep(2**attempt)
     raise RuntimeError(f"USFS recreation request failed: {last}")
 
@@ -45,3 +52,4 @@ if __name__=="__main__":
     campgrounds=[f for f in source if str((f.get("properties") or {}).get("site_type") or "").upper() in CAMP_TYPES]
     write("usfs_trailheads_oakridge_oregon.geojson",trailheads,"Official USFS trailhead infrastructure in the Oakridge / Westfir field area.")
     write("usfs_developed_campgrounds_oakridge_oregon.geojson",campgrounds,"Official developed USFS campgrounds in the Oakridge / Westfir field area.")
+
