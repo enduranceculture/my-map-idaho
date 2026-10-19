@@ -22,10 +22,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install geospatial dependency
+        run: python -m pip install "shapely>=2.0,<3"
       - name: Pull latest USFS trail data
         run: python scripts/pull_usfs_trails.py
       - name: Pull Oakridge access data
         run: python scripts/pull_oakridge_access.py
+      - name: Validate generated data
+        run: python scripts/validate_data.py
       - name: Commit if changed
         run: |
           git config user.name "map-data-bot"
