@@ -9,6 +9,7 @@ Add more regions to REGIONS to expand coverage. Run from repo root:
 import json
 import os
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import date
@@ -94,15 +95,58 @@ def fetch_region(bbox):
             "resultRecordCount": "500",
             "f": "geojson",
         }
-        response = urllib.request.urlopen(
-            BASE + "?" + urllib.parse.urlencode(params), timeout=120
-        )
+        url = BASE + "?" + urllib.parse.urlencode(params)
+        response = None
+        for attempt in range(4):
+            try:
+                response = urllib.request.urlopen(url, timeout=120)
+                break
+            except urllib.error.HTTPError as error:
+                if error.code < 500 or attempt == 3:
+                    raise
+                time.sleep(2**attempt)
+            except urllib.error.URLError:
+                if attempt == 3:
+                    raise
+                time.sleep(2**attempt)
+        if response is None:
+            raise RuntimeError("USFS trail request did not return a response")
+
         feats = json.loads(response.read().decode()).get("features", [])
         features.extend(feats)
         if len(feats) < 500:
             return features
         offset += 500
-        time.sleep(1)
+        time.sleep(0.4)
+
+
+def fetch_statewide_region(bbox):
+    """Split Idaho into modest ArcGIS envelopes, then de-duplicate source segments."""
+    west, south, east, north = [float(value) for value in bbox.split(",")]
+    columns = 4
+    rows = 4
+    lng_step = (east - west) / columns
+    lat_step = (north - south) / rows
+    features_by_id = {}
+
+    for row in range(rows):
+        min_lat = south + row * lat_step
+        max_lat = north if row == rows - 1 else south + (row + 1) * lat_step
+        for column in range(columns):
+            min_lng = west + column * lng_step
+            max_lng = east if column == columns - 1 else west + (column + 1) * lng_step
+            tile_bbox = f"{min_lng:.6f},{min_lat:.6f},{max_lng:.6f},{max_lat:.6f}"
+            for feature in fetch_region(tile_bbox):
+                props = feature.get("properties") or {}
+                key = props.get("objectid")
+                if key is None:
+                    key = json.dumps(
+                        [props.get("trail_cn"), props.get("trail_no"), feature.get("geometry")],
+                        sort_keys=True,
+                    )
+                features_by_id[str(key)] = feature
+
+    return list(features_by_id.values())
 
 
 def is_bike(props):
@@ -337,7 +381,7 @@ if __name__ == "__main__":
     statewide_count = 0
 
     for name, bbox in REGIONS.items():
-        feats = fetch_region(bbox)
+        feats = fetch_statewide_region(bbox) if name == STATEWIDE_REGION else fetch_region(bbox)
         if name == STATEWIDE_REGION:
             feats = clip_features_to_idaho(feats, idaho_boundary)
             statewide_count = len(feats)
