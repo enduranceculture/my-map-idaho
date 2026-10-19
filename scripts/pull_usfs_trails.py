@@ -15,7 +15,13 @@ from datetime import date
 from pathlib import Path
 
 from shapely import make_valid
-from shapely.geometry import GeometryCollection, LineString, MultiLineString, mapping, shape
+from shapely.geometry import (
+    GeometryCollection,
+    LineString,
+    MultiLineString,
+    mapping,
+    shape,
+)
 
 BASE = "https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_TrailNFSPublish_01/MapServer/0/query"
 
@@ -270,10 +276,7 @@ def clip_features_to_idaho(features, boundary):
         geometry = feature.get("geometry")
         if not geometry:
             continue
-        try:
-            intersection = make_valid(shape(geometry)).intersection(boundary)
-        except Exception:
-            continue
+        intersection = make_valid(shape(geometry)).intersection(boundary)
         line = _line_only(intersection)
         if line is None:
             continue
