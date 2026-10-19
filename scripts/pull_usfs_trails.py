@@ -120,14 +120,64 @@ def fetch_region(bbox):
         time.sleep(0.4)
 
 
+def request_json(params, timeout=120):
+    url = BASE + "?" + urllib.parse.urlencode(params)
+    for attempt in range(5):
+        try:
+            with urllib.request.urlopen(url, timeout=timeout) as response:
+                return json.loads(response.read().decode())
+        except urllib.error.HTTPError as error:
+            if error.code < 500 or attempt == 4:
+                raise
+        except urllib.error.URLError:
+            if attempt == 4:
+                raise
+        time.sleep(2**attempt)
+    raise RuntimeError("USFS request retries exhausted")
+
+
+def fetch_object_ids(bbox):
+    payload = request_json(
+        {
+            "geometry": bbox,
+            "geometryType": "esriGeometryEnvelope",
+            "inSR": "4326",
+            "spatialRel": "esriSpatialRelIntersects",
+            "where": "1=1",
+            "returnIdsOnly": "true",
+            "f": "json",
+        }
+    )
+    return [int(value) for value in payload.get("objectIds") or []]
+
+
+def fetch_features_by_ids(object_ids):
+    features = []
+    chunk_size = 180
+    for start in range(0, len(object_ids), chunk_size):
+        chunk = object_ids[start : start + chunk_size]
+        payload = request_json(
+            {
+                "objectIds": ",".join(str(value) for value in chunk),
+                "outFields": FIELDS,
+                "returnGeometry": "true",
+                "outSR": "4326",
+                "f": "geojson",
+            }
+        )
+        features.extend(payload.get("features") or [])
+        time.sleep(0.15)
+    return features
+
+
 def fetch_statewide_region(bbox):
-    """Split Idaho into modest ArcGIS envelopes, then de-duplicate source segments."""
+    """Query IDs in small Idaho tiles, then fetch source features by stable object ID."""
     west, south, east, north = [float(value) for value in bbox.split(",")]
-    columns = 4
-    rows = 4
+    columns = 6
+    rows = 6
     lng_step = (east - west) / columns
     lat_step = (north - south) / rows
-    features_by_id = {}
+    object_ids = set()
 
     for row in range(rows):
         min_lat = south + row * lat_step
@@ -136,17 +186,13 @@ def fetch_statewide_region(bbox):
             min_lng = west + column * lng_step
             max_lng = east if column == columns - 1 else west + (column + 1) * lng_step
             tile_bbox = f"{min_lng:.6f},{min_lat:.6f},{max_lng:.6f},{max_lat:.6f}"
-            for feature in fetch_region(tile_bbox):
-                props = feature.get("properties") or {}
-                key = props.get("objectid")
-                if key is None:
-                    key = json.dumps(
-                        [props.get("trail_cn"), props.get("trail_no"), feature.get("geometry")],
-                        sort_keys=True,
-                    )
-                features_by_id[str(key)] = feature
+            tile_ids = fetch_object_ids(tile_bbox)
+            object_ids.update(tile_ids)
+            print(f"statewide tile {row + 1}/{rows} x {column + 1}/{columns}: {len(tile_ids)} IDs")
 
-    return list(features_by_id.values())
+    ordered_ids = sorted(object_ids)
+    print(f"statewide unique source IDs: {len(ordered_ids)}")
+    return fetch_features_by_ids(ordered_ids)
 
 
 def is_bike(props):
