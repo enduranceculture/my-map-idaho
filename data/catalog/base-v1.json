@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "catalog_id": "my-map-idaho-base-v1",
-  "snapshot_date": "2026-10-07",
+  "snapshot_date": "2026-10-19",
   "repository": "enduranceculture/my-map-idaho",
   "raw_base": "https://raw.githubusercontent.com/enduranceculture/my-map-idaho/main/",
   "purpose": "Stable machine-readable delivery catalog for consuming map applications. Cartography, colors, visibility, zoom behavior, and interaction remain app concerns.",
@@ -422,6 +422,23 @@
         }
       },
       "notes": "Shared canonical Hogaboot hot-springs geography. Personal Hit/Yet remains account-scoped. Access status is dated context, not a live guarantee."
+    },
+    {
+      "id": "trails-idaho-statewide",
+      "label": "Trails — Idaho Statewide (USFS)",
+      "group": "trails",
+      "scope": "statewide",
+      "geometry": "line",
+      "feature_count": 5792,
+      "source_class": "official",
+      "source_attribution": "USDA Forest Service — National Forest System Trails",
+      "delivery": {
+        "browser": {
+          "type": "geojson",
+          "path": "data/trails/usfs_trails_idaho_statewide_map.geojson"
+        }
+      },
+      "notes": "All current USFS National Forest System trail segments returned for Idaho, clipped to the Census Idaho boundary. This does not claim coverage of non-USFS municipal, BLM, state, private, or user-created trails."
     }
   ]
 }
