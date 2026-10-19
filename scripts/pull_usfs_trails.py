@@ -11,12 +11,24 @@ import os
 import time
 import urllib.parse
 import urllib.request
+from datetime import date
+from pathlib import Path
+
+from shapely import make_valid
+from shapely.geometry import GeometryCollection, LineString, MultiLineString, mapping, shape
 
 BASE = "https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_TrailNFSPublish_01/MapServer/0/query"
+
+ROOT = Path(__file__).resolve().parent.parent
+IDAHO_BOUNDARY_PATH = ROOT / "data" / "boundaries" / "idaho_census_2025.geojson"
+CATALOG_PATH = ROOT / "data" / "catalog" / "base-v1.json"
+STATEWIDE_REGION = "idaho_statewide"
 
 # region_name -> bbox as 'min_lon,min_lat,max_lon,max_lat' (WGS84)
 # Each region emits raw, bike-confirmed, and lightweight app-facing GeoJSON layers.
 REGIONS = {
+    # Full Idaho envelope; exact Census-boundary clipping happens after the pull.
+    STATEWIDE_REGION: "-117.30,41.90,-111.00,49.10",
     "woodriver_sawtooth": "-115.2,43.3,-114.0,44.3",
     # Oakridge / Westfir, Oregon field area. Official NFS trails are shared geography;
     # rider Hit/Yet/history remains account-scoped in the MYDAHO app.
@@ -43,6 +55,9 @@ OUT_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "trails")
 # ~4 m in latitude around central Idaho. This keeps every source segment and its
 # true endpoints while making the all-trails browser layer far cheaper to parse.
 MAP_SIMPLIFY_TOLERANCE_DEGREES = 0.00004
+# ~11 m latitude. Statewide delivery needs a smaller browser payload while preserving
+# source topology closely enough for search, highlighting, and ride-candidate geometry.
+STATEWIDE_MAP_SIMPLIFY_TOLERANCE_DEGREES = 0.00010
 
 MAP_PROPERTY_FIELDS = (
     "trail_name",
@@ -148,21 +163,21 @@ def simplify_line(points, tolerance=MAP_SIMPLIFY_TOLERANCE_DEGREES):
     ]
 
 
-def simplify_geometry(geometry):
+def simplify_geometry(geometry, tolerance=MAP_SIMPLIFY_TOLERANCE_DEGREES):
     if not geometry:
         return geometry
     geom_type = geometry.get("type")
     coordinates = geometry.get("coordinates") or []
     if geom_type == "LineString":
-        simplified = simplify_line(coordinates)
+        simplified = simplify_line(coordinates, tolerance)
     elif geom_type == "MultiLineString":
-        simplified = [simplify_line(line) for line in coordinates]
+        simplified = [simplify_line(line, tolerance) for line in coordinates]
     else:
         simplified = coordinates
     return {"type": geom_type, "coordinates": simplified}
 
 
-def browser_feature(feature):
+def browser_feature(feature, tolerance=MAP_SIMPLIFY_TOLERANCE_DEGREES):
     """Create the lightweight, normalized feature apps should render directly."""
     source_props = feature.get("properties") or {}
     trail_cn = source_props.get("trail_cn")
@@ -187,7 +202,7 @@ def browser_feature(feature):
     return {
         "type": "Feature",
         "properties": props,
-        "geometry": simplify_geometry(feature.get("geometry")),
+        "geometry": simplify_geometry(feature.get("geometry"), tolerance),
     }
 
 
@@ -196,33 +211,150 @@ def save(path, features):
         json.dump({"type": "FeatureCollection", "features": features}, handle)
 
 
-def save_browser_layer(path, features, region):
+def save_browser_layer(
+    path,
+    features,
+    region,
+    tolerance=MAP_SIMPLIFY_TOLERANCE_DEGREES,
+):
     payload = {
         "type": "FeatureCollection",
         "metadata": {
             "source": "USFS EDW TrailNFS",
             "region": region,
-            "simplification_tolerance_degrees": MAP_SIMPLIFY_TOLERANCE_DEGREES,
+            "simplification_tolerance_degrees": tolerance,
             "access_note": (
                 "bike_status=unknown means USFS bicycle fields are blank; it does not mean bicycles are prohibited"
             ),
         },
-        "features": [browser_feature(feature) for feature in features],
+        "features": [browser_feature(feature, tolerance) for feature in features],
     }
     with open(path, "w") as handle:
         json.dump(payload, handle, separators=(",", ":"))
 
 
+
+def load_idaho_boundary():
+    with IDAHO_BOUNDARY_PATH.open() as handle:
+        payload = json.load(handle)
+    features = payload.get("features") or []
+    if not features:
+        raise RuntimeError("Idaho boundary is missing")
+    return make_valid(shape(features[0]["geometry"]))
+
+
+def _line_only(geometry):
+    if geometry.is_empty:
+        return None
+    if isinstance(geometry, (LineString, MultiLineString)):
+        return geometry
+    if isinstance(geometry, GeometryCollection):
+        lines = []
+        for item in geometry.geoms:
+            if isinstance(item, LineString) and not item.is_empty:
+                lines.append(item)
+            elif isinstance(item, MultiLineString):
+                lines.extend(line for line in item.geoms if not line.is_empty)
+        if not lines:
+            return None
+        if len(lines) == 1:
+            return lines[0]
+        return MultiLineString([list(line.coords) for line in lines])
+    return None
+
+
+def clip_features_to_idaho(features, boundary):
+    """Clip source trail lines to Idaho instead of treating the bounding box as the state."""
+    clipped = []
+    for feature in features:
+        geometry = feature.get("geometry")
+        if not geometry:
+            continue
+        try:
+            intersection = make_valid(shape(geometry)).intersection(boundary)
+        except Exception:
+            continue
+        line = _line_only(intersection)
+        if line is None:
+            continue
+        clipped.append(
+            {
+                "type": "Feature",
+                "properties": feature.get("properties") or {},
+                "geometry": mapping(line),
+            }
+        )
+    return clipped
+
+
+def update_statewide_catalog(feature_count):
+    with CATALOG_PATH.open() as handle:
+        catalog = json.load(handle)
+
+    entry = {
+        "id": "trails-idaho-statewide",
+        "label": "Trails — Idaho Statewide (USFS)",
+        "group": "trails",
+        "scope": "statewide",
+        "geometry": "line",
+        "feature_count": feature_count,
+        "source_class": "official",
+        "source_attribution": "USDA Forest Service — National Forest System Trails",
+        "delivery": {
+            "browser": {
+                "type": "geojson",
+                "path": "data/trails/usfs_trails_idaho_statewide_map.geojson",
+            }
+        },
+        "notes": (
+            "All current USFS National Forest System trail segments returned for Idaho, "
+            "clipped to the Census Idaho boundary. This does not claim coverage of "
+            "non-USFS municipal, BLM, state, private, or user-created trails."
+        ),
+    }
+
+    layers = catalog.get("layers") or []
+    for index, layer in enumerate(layers):
+        if layer.get("id") == entry["id"]:
+            layers[index] = entry
+            break
+    else:
+        layers.append(entry)
+
+    catalog["layers"] = layers
+    catalog["snapshot_date"] = date.today().isoformat()
+    with CATALOG_PATH.open("w") as handle:
+        json.dump(catalog, handle, indent=2, ensure_ascii=False)
+        handle.write("\n")
+
+
 if __name__ == "__main__":
     os.makedirs(OUT_DIR, exist_ok=True)
+    idaho_boundary = load_idaho_boundary()
+    statewide_count = 0
+
     for name, bbox in REGIONS.items():
         feats = fetch_region(bbox)
-        save(os.path.join(OUT_DIR, f"usfs_trails_{name}.geojson"), feats)
+        if name == STATEWIDE_REGION:
+            feats = clip_features_to_idaho(feats, idaho_boundary)
+            statewide_count = len(feats)
+
         bike = [feature for feature in feats if is_bike(feature["properties"])]
-        save(os.path.join(OUT_DIR, f"usfs_bike_trails_{name}.geojson"), bike)
+
+        # Keep the existing source-rich regional files. A duplicate statewide raw dump
+        # would be large and adds no app value; the compact official browser derivative
+        # is the canonical statewide delivery artifact.
+        if name != STATEWIDE_REGION:
+            save(os.path.join(OUT_DIR, f"usfs_trails_{name}.geojson"), feats)
+            save(os.path.join(OUT_DIR, f"usfs_bike_trails_{name}.geojson"), bike)
 
         browser_path = os.path.join(OUT_DIR, f"usfs_trails_{name}_map.geojson")
-        save_browser_layer(browser_path, feats, name)
+        tolerance = (
+            STATEWIDE_MAP_SIMPLIFY_TOLERANCE_DEGREES
+            if name == STATEWIDE_REGION
+            else MAP_SIMPLIFY_TOLERANCE_DEGREES
+        )
+        save_browser_layer(browser_path, feats, name, tolerance)
 
         miles = sum(feature["properties"].get("gis_miles") or 0 for feature in feats)
         browser_mb = os.path.getsize(browser_path) / 1_000_000
@@ -230,3 +362,6 @@ if __name__ == "__main__":
             f"{name}: {len(feats)} segments ({miles:,.0f} mi), "
             f"{len(bike)} bike-confirmed segments, browser layer {browser_mb:.1f} MB"
         )
+
+    if statewide_count:
+        update_statewide_catalog(statewide_count)
