@@ -25,6 +25,7 @@ from shapely.geometry import (
 )
 
 BASE = "https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_TrailNFSPublish_01/MapServer/0/query"
+USER_AGENT = "my-map-idaho/1.4 (+https://github.com/enduranceculture/my-map-idaho)"
 
 ROOT = Path(__file__).resolve().parent.parent
 IDAHO_BOUNDARY_PATH = ROOT / "data" / "boundaries" / "idaho_census_2025.geojson"
@@ -95,24 +96,8 @@ def fetch_region(bbox):
             "resultRecordCount": "500",
             "f": "geojson",
         }
-        url = BASE + "?" + urllib.parse.urlencode(params)
-        response = None
-        for attempt in range(4):
-            try:
-                response = urllib.request.urlopen(url, timeout=120)
-                break
-            except urllib.error.HTTPError as error:
-                if error.code < 500 or attempt == 3:
-                    raise
-                time.sleep(2**attempt)
-            except urllib.error.URLError:
-                if attempt == 3:
-                    raise
-                time.sleep(2**attempt)
-        if response is None:
-            raise RuntimeError("USFS trail request did not return a response")
-
-        feats = json.loads(response.read().decode()).get("features", [])
+        payload = request_json(params)
+        feats = payload.get("features") or []
         features.extend(feats)
         if len(feats) < 500:
             return features
@@ -121,19 +106,31 @@ def fetch_region(bbox):
 
 
 def request_json(params, timeout=120):
-    url = BASE + "?" + urllib.parse.urlencode(params)
+    encoded = urllib.parse.urlencode(params).encode("utf-8")
+    request = urllib.request.Request(
+        BASE,
+        data=encoded,
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        method="POST",
+    )
+    last_error = None
     for attempt in range(5):
         try:
-            with urllib.request.urlopen(url, timeout=timeout) as response:
-                return json.loads(response.read().decode())
-        except urllib.error.HTTPError as error:
-            if error.code < 500 or attempt == 4:
-                raise
-        except urllib.error.URLError:
-            if attempt == 4:
-                raise
-        time.sleep(2**attempt)
-    raise RuntimeError("USFS request retries exhausted")
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+            if isinstance(payload, dict) and payload.get("error"):
+                last_error = payload["error"]
+            else:
+                return payload
+        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as error:
+            last_error = error
+        if attempt < 4:
+            time.sleep(2**attempt)
+    raise RuntimeError(f"USFS trail request failed after retries: {last_error}")
 
 
 def fetch_object_ids(bbox):
